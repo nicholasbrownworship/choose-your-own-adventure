@@ -1,0 +1,1295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Adventure Shelf</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; background: #0b0f14; color: #e8eef6; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 22px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap: 12px; margin-bottom: 14px; }
+    .brand { font-weight: 800; letter-spacing: .3px; }
+    .card { background: #121826; border: 1px solid #243048; border-radius: 16px; padding: 18px; box-shadow: 0 12px 34px rgba(0,0,0,.25); }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .storyCard { background:#101a2b; border:1px solid #243048; border-radius:16px; padding:14px; cursor:pointer; transition: transform .05s ease, background .15s ease, border-color .15s ease; }
+    .storyCard:hover { background:#14203a; border-color:#38507a; }
+    .storyCard:active { transform: translateY(1px); }
+    .tagRow { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; opacity:.9; font-size:12px; }
+    .tag { background:#0b1220; border:1px solid #25314a; border-radius:999px; padding:5px 9px; }
+    h1 { font-size: 20px; margin: 0 0 8px; }
+    h2 { font-size: 16px; margin: 0 0 6px; }
+    p { margin: 0; opacity:.9; line-height: 1.45; }
+    .muted { opacity:.7; font-size: 13px; }
+    .divider { height:1px; background:#23314a; margin:14px 0; opacity:.7; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    button {
+      background: #162238;
+      border: 1px solid #2a3a58;
+      color: #e8eef6;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: transform .05s ease, background .15s ease, border-color .15s ease;
+    }
+    button:hover { background: #1b2a46; border-color: #38507a; }
+    button:active { transform: translateY(1px); }
+    button.danger { background:#2a1420; border-color:#5a2a40; }
+    button.danger:hover { background:#361a28; border-color:#7a3a56; }
+    button.ghost { background: transparent; }
+    .playTitle { font-weight: 800; letter-spacing: .2px; }
+    .meta { display:flex; gap:10px; flex-wrap:wrap; opacity:.9; font-size: 13px; }
+    .pill { background: #0b1220; border: 1px solid #25314a; border-radius: 999px; padding: 6px 10px; }
+    .story { white-space: pre-wrap; line-height: 1.55; font-size: 16px; margin: 12px 0 14px; }
+    .choices { display:grid; gap: 10px; margin-top: 10px; }
+    .choiceBtn { width:100%; text-align:left; padding: 12px; }
+    .footer { margin-top: 10px; opacity:.65; font-size: 12px; }
+    .smallNote { opacity:.75; font-size: 12px; margin-top: 10px; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">Adventure Shelf</div>
+      <div class="row">
+        <button id="btnHome" class="ghost">Home</button>
+        <button id="btnClearAll" class="danger">Clear All Progress</button>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div id="home" class="card">
+      <h1>Pick a story</h1>
+      <p class="muted">Choose a tale. Your progress auto-resumes per story (no manual saving).</p>
+      <div class="divider"></div>
+      <div id="storyGrid" class="grid"></div>
+      <div class="smallNote">Want to add more stories? Duplicate one in <b>LIBRARY</b> and change the nodes.</div>
+    </div>
+
+    <!-- PLAY -->
+    <div id="play" class="card hidden">
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <div id="playTitle" class="playTitle"></div>
+          <div id="playSubtitle" class="muted"></div>
+        </div>
+        <div class="row">
+          <button id="btnBack">Back</button>
+          <button id="btnRestart" class="danger">Restart Story</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div id="meta" class="meta"></div>
+      <div class="story" id="nodeText"></div>
+      <div class="choices" id="choices"></div>
+
+      <div class="footer" id="footer"></div>
+    </div>
+  </div>
+
+<script>
+/**
+ * Multi-story CYOA engine (single-file)
+ * - Landing page (Home) lists stories
+ * - Each story has independent state
+ * - Auto-resume per story via localStorage (small + useful)
+ * - Conditions/effects/once supported
+ */
+
+const STORAGE_PREFIX = "adventure_shelf_story_v1::";
+
+// -------------------- Story Library --------------------
+const LIBRARY = [
+  // STAR WARS 1
+  {
+    id: "sw_cantina_job",
+    title: "Star Wars: The Cantina Job",
+    genre: "Star Wars",
+    blurb: "A quick credit run in a dusty cantina turns into a choice between trouble and worse trouble.",
+    start: "entry",
+    initialState: { stats: { hp: 3, nerve: 0 }, flags: [], items: [] },
+    nodes: {
+      entry: {
+        title: "Neon & Dust",
+        text:
+`You step into the cantina. Music fights the heat. Everyone looks busy pretending they aren't watching you.
+
+A Twi’lek bartender slides a napkin your way: "Need a runner. No questions."`,
+        choices: [
+          { text: "Take the napkin and sit.", to: "sit", effects:{ addStats:{ nerve:+1 } } },
+          { text: "Ignore it and order something harmless.", to: "drink" },
+          { text: "Scan the room for Imperial attention.", to: "scan" }
+        ]
+      },
+      drink: {
+        title: "Harmless, Sure",
+        text:
+`The drink tastes like regret and pennies. A gambler at the next table whispers: "Wrong night to be invisible."`,
+        choices: [
+          { text: "Ask what he means.", to: "gambler" },
+          { text: "Go back to the bartender.", to: "sit" }
+        ]
+      },
+      scan: {
+        title: "Eyes Everywhere",
+        text:
+`You spot two off-duty troopers failing to look casual. The bartender notices your glance.
+
+"Runner job pays double if you leave now," she says.`,
+        choices: [
+          { text: "Leave immediately with the napkin.", to: "alley", effects:{ setFlags:["has_job"] } },
+          { text: "Confront the troopers (bad idea).", to: "troopers", req:{ statMin:{ nerve:1 } }, effects:{ addStats:{ nerve:+1 } } },
+          { text: "Sit and act normal.", to: "sit" }
+        ]
+      },
+      sit: {
+        title: "Terms of Trouble",
+        text:
+`The napkin has coordinates and one word: "Puck."
+
+The bartender leans in: "Deliver a datapuck to Dock 3. Don't open it. Don't lose it."`,
+        choices: [
+          { text: "Agree. Take the datapuck.", to: "alley", effects:{ addItems:["datapuck"], setFlags:["has_job"] }, once:true },
+          { text: "Ask who's after it.", to: "after" },
+          { text: "Decline and walk out.", to: "walkout" }
+        ]
+      },
+      after: {
+        title: "Who's After It?",
+        text:
+`"Everyone," she says. "Mostly the kind that smiles while lying."
+
+A small droid bumps your boot. A message pings: "I can help. For a price."`,
+        choices: [
+          { text: "Hire the droid guide.", to: "alley", effects:{ addItems:["guide_droid"] } },
+          { text: "No thanks. Go alone.", to: "alley" }
+        ]
+      },
+      walkout: {
+        title: "Bad Timing",
+        text:
+`You turn to leave. The off-duty troopers stand up at the same time.
+
+One says: "Citizen. A moment."`,
+        choices: [
+          { text: "Run.", to: "run", effects:{ addStats:{ hp:-1, nerve:+1 } } },
+          { text: "Smile and talk your way out.", to: "talk", req:{ statMin:{ nerve:1 } } }
+        ]
+      },
+      troopers: {
+        title: "Stormtrooper Social Hour",
+        text:
+`They look you over. You look back. Everyone makes the same mistake: assuming the other guy is bluffing.`,
+        choices: [
+          { text: "Start a bar fight as a distraction.", to: "fight", effects:{ addStats:{ hp:-1, nerve:+1 }, setFlags:["chaos"] } },
+          { text: "Back down and leave now.", to: "alley" }
+        ]
+      },
+      talk: {
+        title: "Your Best Face",
+        text:
+`You keep it calm. You keep it polite. Somehow it works.
+
+The troopers get bored and return to their drinks.`,
+        choices: [
+          { text: "Take the runner job and leave.", to: "alley", effects:{ addItems:["datapuck"], setFlags:["has_job"] }, once:true },
+          { text: "Leave without the job.", to: "end_safe" }
+        ]
+      },
+      run: {
+        title: "Fast Exit",
+        text:
+`You bolt through the back. Blaster fire sings past you. You survive, but you definitely made an enemy.`,
+        choices: [
+          { text: "Disappear into the alleyways.", to: "alley", effects:{ setFlags:["spotted"] } }
+        ]
+      },
+      gambler: {
+        title: "The Gambler",
+        text:
+`He flicks a coin. "Imperials want a datapuck tonight. Someone already paid to blame you."`,
+        choices: [
+          { text: "Take the runner job before it gets worse.", to: "sit", effects:{ addStats:{ nerve:+1 } } },
+          { text: "Leave the cantina immediately.", to: "end_safe" }
+        ]
+      },
+      alley: {
+        title: "Back Alley Heat",
+        text:
+`The night air is cooler, but the danger isn't.
+
+Dock 3 is close. You hear boots behind you.`,
+        choices: [
+          { text: "Blend into a crowd.", to: "crowd", effects:{ addStats:{ nerve:+1 } } },
+          { text: "Duck into an equipment shed.", to: "shed" },
+          { text: "Sprint straight for Dock 3.", to: "dock3", effects:{ addStats:{ hp:-1 } } }
+        ]
+      },
+      crowd: {
+        title: "Crowd Cover",
+        text:
+`You move like you belong. For a moment, you do.
+
+A hand brushes your pocket. Pickpocket.`,
+        choices: [
+          { text: "Grab the thief.", to: "thief", req:{ items:["datapuck"] } },
+          { text: "Let it go. Keep moving.", to: "dock3" }
+        ]
+      },
+      thief: {
+        title: "Sticky Fingers",
+        text:
+`You catch a kid with fast hands. He looks terrified… and hungry.
+
+He points: "They’re waiting at Dock 3."`,
+        choices: [
+          { text: "Pay the kid for the warning (+nerve).", to: "dock3", effects:{ addStats:{ nerve:+1 }, setFlags:["warned"] } },
+          { text: "Let him go and hurry.", to: "dock3" }
+        ]
+      },
+      shed: {
+        title: "Equipment Shed",
+        text:
+`Inside: crates, cables, and a maintenance access panel with a weak lock.`,
+        choices: [
+          { text: "Pop the panel and take the shortcut.", to: "tunnel", req:{ items:["guide_droid"] }, effects:{ setFlags:["shortcut"] } },
+          { text: "Kick the lock (loud).", to: "dock3", effects:{ setFlags:["loud"] } },
+          { text: "Back out to the alley.", to: "alley" }
+        ]
+      },
+      tunnel: {
+        title: "Service Tunnel",
+        text:
+`The droid chirps happily. You emerge behind Dock 3, unseen.
+
+The contact waits: a calm Duros with a case.`,
+        choices: [
+          { text: "Hand over the datapuck.", to: "end_good", req:{ items:["datapuck"] } },
+          { text: "Open the datapuck yourself (temptation).", to: "end_bad" }
+        ]
+      },
+      dock3: {
+        title: "Dock 3",
+        text:
+`A Duros waits by a cargo ramp. Also waiting: trouble.
+
+You feel the moment where a story chooses you back.`,
+        choices: [
+          { text: "Hand over the datapuck fast.", to: "end_good", req:{ items:["datapuck"] } },
+          { text: "Try to bargain for more credits.", to: "end_mid", effects:{ addStats:{ nerve:+1 } } },
+          { text: "Open the datapuck.", to: "end_bad" }
+        ]
+      },
+      fight: {
+        title: "Chaos",
+        text:
+`Tables flip. Someone screams. Someone cheers. The music never stops.
+
+You slip out in the confusion.`,
+        choices: [
+          { text: "Run the alley route to Dock 3.", to: "alley", effects:{ addItems:["datapuck"], setFlags:["has_job","chaos"] }, once:true }
+        ]
+      },
+      end_safe: {
+        title: "Live Another Night",
+        text:
+`You leave before the story hooks you. Smart.
+
+Somewhere behind you, blasters fire anyway.
+
+THE END (Safe Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_mid: {
+        title: "Paid, Barely",
+        text:
+`You talk. He listens. He pays… but not happily.
+
+You get credits and a new problem.
+
+THE END (Messy Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_good: {
+        title: "Clean Delivery",
+        text:
+`He takes the datapuck, swaps a credit chip into your palm, and vanishes like it was never real.
+
+For once, it feels like a win.
+
+THE END (Good Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_bad: {
+        title: "Curiosity Tax",
+        text:
+`You crack the datapuck. A red light flashes. Tracking beacon.
+
+Everyone’s eyes find you at once.
+
+THE END (Bad Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      }
+    }
+  },
+
+  // STAR WARS 2
+  {
+    id: "sw_jedi_ruins",
+    title: "Star Wars: Echoes in the Ruins",
+    genre: "Star Wars",
+    blurb: "A half-buried Jedi site. A humming door. The Force doesn't care if you're ready.",
+    start: "approach",
+    initialState: { stats: { hp: 3, focus: 0 }, flags: [], items: [] },
+    nodes: {
+      approach: {
+        title: "Sand-Cut Stones",
+        text:
+`You find the ruins at dusk. Broken pillars. Old carvings. A sealed doorway with a faint, steady hum.
+
+Your comlink crackles: "Take pictures. Get out. Don't touch anything."`,
+        choices: [
+          { text:"Touch the door anyway.", to:"door", effects:{ addStats:{ focus:+1 }, setFlags:["touched"] } },
+          { text:"Scout the perimeter first.", to:"perimeter" },
+          { text:"Do what you were told: leave.", to:"end_leave" }
+        ]
+      },
+      perimeter: {
+        title: "Perimeter",
+        text:
+`You circle the site. A small alcove holds an old satchel—recent, not ancient.
+
+You also spot a motion sensor tripod pointed at the door.`,
+        choices: [
+          { text:"Take the satchel.", to:"approach", effects:{ addItems:["satchel"], addStats:{ focus:+1 } }, once:true },
+          { text:"Disable the tripod sensor.", to:"approach", effects:{ setFlags:["sensor_off"] }, req:{ statMin:{ focus:1 } }, once:true },
+          { text:"Ignore it and return to the door.", to:"door" }
+        ]
+      },
+      door: {
+        title: "The Humming Door",
+        text:
+`The door hums louder when you stand close. Like it recognizes you… or thinks it does.
+
+There’s a palm-shaped indentation. Not your hand size.`,
+        choices: [
+          { text:"Try the indentation anyway.", to:"trial", effects:{ addStats:{ hp:-1 } } },
+          { text:"Check the satchel for clues.", to:"clues", req:{ items:["satchel"] } },
+          { text:"Walk away. Now.", to:"end_leave" }
+        ]
+      },
+      clues: {
+        title: "Clues",
+        text:
+`Inside the satchel: a thin glove with conductive filaments and a data-slate with one line:
+
+"Let the door believe."`,
+        choices: [
+          { text:"Put on the glove and try the indentation.", to:"open", effects:{ addItems:["glove"] } },
+          { text:"Pocket the glove and leave.", to:"end_leave" }
+        ]
+      },
+      trial: {
+        title: "Trial",
+        text:
+`The door rejects you. The hum becomes a snap. Your arm goes numb.
+
+In the sand, a small holocron-shaped shadow appears—like something is almost there.`,
+        choices: [
+          { text:"Reach for the shadow.", to:"shadow", effects:{ addStats:{ focus:+1 } } },
+          { text:"Retreat and stop being brave.", to:"end_leave" }
+        ]
+      },
+      shadow: {
+        title: "Almost-There",
+        text:
+`Your fingers close on air… and then on something cold.
+
+A tiny holodisc clicks in your palm.`,
+        choices: [
+          { text:"Use the holodisc at the door.", to:"open", effects:{ addItems:["holodisc"] } },
+          { text:"Do not. Leave with it.", to:"end_loot" }
+        ]
+      },
+      open: {
+        title: "The Door Opens",
+        text:
+`The hum harmonizes with your breathing. The door slides open a finger’s width.
+
+Inside: darkness, and the smell of rain.`,
+        choices: [
+          { text:"Enter the ruins.", to:"inside", effects:{ addStats:{ focus:+1 } } },
+          { text:"Take a photo and leave.", to:"end_leave" }
+        ]
+      },
+      inside: {
+        title: "Inside",
+        text:
+`A chamber. A broken statue. A shallow pool that reflects stars you can't see aboveground.
+
+A voice that isn't a voice: "WHY ARE YOU HERE?"`,
+        choices: [
+          { text:"For answers.", to:"answers", effects:{ setFlags:["asked_answers"] } },
+          { text:"For profit.", to:"profit", effects:{ setFlags:["asked_profit"] } },
+          { text:"I don’t know.", to:"truth", effects:{ addStats:{ focus:+1 } } }
+        ]
+      },
+      answers: {
+        title: "Answers",
+        text:
+`"THEN LISTEN," it says.
+
+Your head fills with a map you didn't study. A route. A warning.`,
+        choices: [
+          { text:"Accept the map and leave quietly.", to:"end_map", effects:{ setFlags:["got_map"] } },
+          { text:"Ask for power instead.", to:"power", req:{ statMin:{ focus:2 } }, effects:{ addStats:{ hp:-1 } } }
+        ]
+      },
+      profit: {
+        title: "Profit",
+        text:
+`The pool ripples. Your reflection smiles a beat too late.
+
+"YOU WILL BE PAID IN CONSEQUENCES."`,
+        choices: [
+          { text:"Run.", to:"end_run" },
+          { text:"Stay and apologize.", to:"truth", effects:{ addStats:{ focus:+1 } } }
+        ]
+      },
+      truth: {
+        title: "Truth",
+        text:
+`"GOOD," it says. "BEGIN THERE."
+
+The chamber feels less hostile. Still not friendly.`,
+        choices: [
+          { text:"Leave with what you learned.", to:"end_map", effects:{ setFlags:["got_map"] } },
+          { text:"Touch the pool.", to:"end_weird", req:{ statMin:{ focus:2 } } }
+        ]
+      },
+      power: {
+        title: "Power",
+        text:
+`Your fingers tingle. Your heartbeat stutters. The chamber gives you something sharp and bright.
+
+It will cut both ways.
+
+THE END (Power Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_leave: {
+        title: "Professional",
+        text:
+`You leave. Smart. Alive. Slightly disappointed.
+
+Some mysteries stay mysteries because they eat people.
+
+THE END (Leave Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_loot: {
+        title: "Loot",
+        text:
+`You leave with the holodisc. It feels heavier each step, like it’s accumulating attention.
+
+THE END (Loot Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_map: {
+        title: "A Route in Your Mind",
+        text:
+`You exit the ruins with a map in your skull.
+
+You can’t un-know it. But you can use it.
+
+THE END (Map Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_run: {
+        title: "Flight",
+        text:
+`You sprint back to your speeder. The ruins are silent again, like they never spoke.
+
+You still hear it anyway.
+
+THE END (Run Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_weird: {
+        title: "Reflected Stars",
+        text:
+`You touch the pool and see yourself in a future you don’t recognize.
+
+Then you blink, and it’s gone—except you’re smiling.
+
+THE END (Weird Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      }
+    }
+  },
+
+  // STAR WARS 3
+  {
+    id: "sw_bounty_ping",
+    title: "Star Wars: Bounty Ping",
+    genre: "Star Wars",
+    blurb: "Your puck pings with a live bounty. Easy credits… until you realize why it’s live.",
+    start: "ping",
+    initialState: { stats: { hp: 3, grit: 0 }, flags: [], items: [] },
+    nodes: {
+      ping: {
+        title: "The Ping",
+        text:
+`Your bounty puck lights up: LIVE CONTRACT. Nearby. High value.
+
+It includes a warning: "TARGET MAY BE YOU."`,
+        choices: [
+          { text:"Check your reflection for a tracking tag.", to:"check", effects:{ addStats:{ grit:+1 } } },
+          { text:"Head to the last-known location anyway.", to:"street" },
+          { text:"Power down the puck.", to:"off" }
+        ]
+      },
+      check: {
+        title: "Check",
+        text:
+`You find a tiny adhesive tag under your collar—fresh.
+
+Someone wants hunters to converge on you.`,
+        choices: [
+          { text:"Rip the tag off.", to:"street", effects:{ setFlags:["tag_removed"], addStats:{ grit:+1 } } },
+          { text:"Leave it on and set a trap.", to:"trap", req:{ statMin:{ grit:1 } } }
+        ]
+      },
+      off: {
+        title: "Silence",
+        text:
+`You power it down. The street gets quieter.
+
+Then you notice the quiet is because people are watching from cover.`,
+        choices: [
+          { text:"Walk calmly and don’t run.", to:"street", effects:{ addStats:{ grit:+1 } } },
+          { text:"Run (they love that).", to:"end_bad", effects:{ addStats:{ hp:-1 } } }
+        ]
+      },
+      street: {
+        title: "Market Street",
+        text:
+`Crowds. Vendors. A perfect place to disappear… or be cornered.
+
+A Rodian seller hisses: "They're coming. I can change your face."`,
+        choices: [
+          { text:"Pay for a quick disguise.", to:"disguise", effects:{ addItems:["disguise"], addStats:{ grit:+1 } } },
+          { text:"Decline and slip into the alleys.", to:"alleys" },
+          { text:"Confront the nearest hunter head-on.", to:"fight", req:{ statMin:{ grit:1 } }, effects:{ addStats:{ hp:-1, grit:+1 } } }
+        ]
+      },
+      disguise: {
+        title: "New Face",
+        text:
+`A smear of synth-skin and a cheap cap. It’s not perfect, but it buys seconds.
+
+A bounty hunter pauses… uncertain.`,
+        choices: [
+          { text:"Walk past like you own the place.", to:"end_good", effects:{ setFlags:["escaped"] } },
+          { text:"Use the moment to steal their comms.", to:"end_mid", req:{ statMin:{ grit:2 } } }
+        ]
+      },
+      alleys: {
+        title: "Alleys",
+        text:
+`You cut through narrow lanes. A speeder blocks the exit. Two hunters step out.
+
+One says: "Nothing personal. Just credits."`,
+        choices: [
+          { text:"Offer to split the bounty if they turn on the client.", to:"end_mid", effects:{ addStats:{ grit:+1 } } },
+          { text:"Fight your way out.", to:"end_bad", effects:{ addStats:{ hp:-2 } } },
+          { text:"Trigger your trap.", to:"end_good", req:{ flags:["tag_removed"] } }
+        ]
+      },
+      trap: {
+        title: "Trap",
+        text:
+`You keep the tag. Let them come.
+
+You pick a chokepoint and wait—breathing slow, eyes wide.`,
+        choices: [
+          { text:"Ambush the first hunter and steal their puck.", to:"end_mid", effects:{ addItems:["hunter_puck"], addStats:{ grit:+1 } } },
+          { text:"Slip away during the confusion.", to:"end_good", effects:{ setFlags:["escaped"] } }
+        ]
+      },
+      fight: {
+        title: "First Punch",
+        text:
+`You hit first. It buys you space, not safety.
+
+The crowd scatters.`,
+        choices: [
+          { text:"Disappear into the crowd.", to:"end_good" },
+          { text:"Chase the hunter’s speeder (reckless).", to:"end_bad", effects:{ addStats:{ hp:-1 } } }
+        ]
+      },
+      end_good: {
+        title: "Not Today",
+        text:
+`You live. You vanish. The puck will ping again someday.
+
+But not today.
+
+THE END (Good Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_mid: {
+        title: "Credits, at a Cost",
+        text:
+`You gain intel, maybe credits, definitely enemies.
+
+In your line of work, that’s still a win.
+
+THE END (Gray Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_bad: {
+        title: "Dogpile",
+        text:
+`The hunters converge. Too many angles. Too many blasters.
+
+Your last thought is: "Yeah… that was obviously a setup."
+
+THE END (Bad Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      }
+    }
+  },
+
+  // FANTASY
+  {
+    id: "fantasy_dragons_toll",
+    title: "Fantasy: Dragon’s Toll",
+    genre: "Fantasy",
+    blurb: "A bridge, a dragon, and a town that can’t afford honesty.",
+    start: "bridge",
+    initialState: { stats: { hp: 3, valor: 0 }, flags: [], items: [] },
+    nodes: {
+      bridge: {
+        title: "The Toll Bridge",
+        text:
+`A stone bridge spans a misty gorge. At its center sits a young dragon with a ledger and an inkpot.
+
+It clears its throat: "Name? Purpose? And… toll."`,
+        choices: [
+          { text:"Pay the toll (if you can).", to:"pay" },
+          { text:"Flatter the dragon outrageously.", to:"flatter", effects:{ addStats:{ valor:+1 } } },
+          { text:"Challenge it to a duel of riddles.", to:"riddles", effects:{ addStats:{ valor:+1 } } }
+        ]
+      },
+      pay: {
+        title: "Payment",
+        text:
+`You check your purse. It's mostly optimism.
+
+The dragon taps the ledger. "We accept coin, stories, or favors."`,
+        choices: [
+          { text:"Offer a story.", to:"story", effects:{ setFlags:["paid_story"] } },
+          { text:"Offer a favor.", to:"favor", effects:{ setFlags:["paid_favor"] } },
+          { text:"Admit you’re broke and leave.", to:"end_broke" }
+        ]
+      },
+      flatter: {
+        title: "Flattery",
+        text:
+`You praise its scales, its posture, its obvious financial literacy.
+
+The dragon smiles despite itself: "Continue."`,
+        choices: [
+          { text:"Promise to bring it a 'crown of starlight' from town.", to:"town", effects:{ setFlags:["promised_crown"] } },
+          { text:"Ask for passage as a 'patron of the arts.'", to:"pass", req:{ statMin:{ valor:1 } } }
+        ]
+      },
+      riddles: {
+        title: "Riddles",
+        text:
+`The dragon leans in. "A fair contest."
+
+It asks: "What grows when shared, and shrinks when hoarded?"`,
+        choices: [
+          { text:"Answer: 'A secret.'", to:"end_wrong" },
+          { text:"Answer: 'A story.'", to:"pass", effects:{ addStats:{ valor:+1 } } },
+          { text:"Answer: 'A fire.'", to:"end_wrong" }
+        ]
+      },
+      story: {
+        title: "Your Story",
+        text:
+`You tell it about the time you outran a storm on a borrowed horse.
+
+The dragon writes for a long time. "Acceptable. You may pass."`,
+        choices: [
+          { text:"Cross the bridge.", to:"pass" }
+        ]
+      },
+      favor: {
+        title: "A Favor",
+        text:
+`"Bring me proof the town elder has been skimming from the bridge fund," it says.
+
+"Everyone keeps 'forgetting' the toll exists."`,
+        choices: [
+          { text:"Go to town.", to:"town", effects:{ addStats:{ valor:+1 } } },
+          { text:"Refuse and retreat.", to:"end_broke" }
+        ]
+      },
+      town: {
+        title: "Town",
+        text:
+`The elder’s house is warm, too warm. Guards outside pretend not to see you.
+
+A servant whispers: "The ledger is in the study. Don't get caught."`,
+        choices: [
+          { text:"Sneak into the study.", to:"study", req:{ statMin:{ valor:1 } }, effects:{ addStats:{ hp:-1 } } },
+          { text:"Bribe a guard for info.", to:"info", effects:{ setFlags:["bribed"] } },
+          { text:"Give up and go back.", to:"bridge" }
+        ]
+      },
+      info: {
+        title: "Guard Info",
+        text:
+`The guard takes your coin and your dignity.
+
+"They hide the real books under the hearthstone," he mutters.`,
+        choices: [
+          { text:"Break into the house and check the hearth.", to:"study", effects:{ setFlags:["hearth_hint"] } },
+          { text:"Return to the dragon with this.", to:"bridge" }
+        ]
+      },
+      study: {
+        title: "The Study",
+        text:
+`You find the books. Two sets. One honest, one… creative.
+
+Footsteps approach.`,
+        choices: [
+          { text:"Grab the fake ledger and run.", to:"dragon_proof", effects:{ addItems:["fake_ledger"] } },
+          { text:"Grab the honest ledger and run.", to:"dragon_proof", effects:{ addItems:["honest_ledger"] } },
+          { text:"Hide under the desk like a professional hero.", to:"end_caught" }
+        ]
+      },
+      dragon_proof: {
+        title: "Back to the Bridge",
+        text:
+`The dragon waits patiently, quill ready.
+
+"Show me," it says.`,
+        choices: [
+          { text:"Hand over the honest ledger.", to:"end_good", req:{ items:["honest_ledger"] } },
+          { text:"Hand over the fake ledger.", to:"end_mid", req:{ items:["fake_ledger"] } },
+          { text:"Admit you only have rumors.", to:"end_broke" }
+        ]
+      },
+      pass: {
+        title: "Passage",
+        text:
+`The dragon stamps your name into the ledger with a flourish.
+
+"You may pass. Also: I like you."`,
+        choices: [
+          { text:"Cross into the mist.", to:"end_good" }
+        ]
+      },
+      end_good: {
+        title: "A Fair Toll",
+        text:
+`The dragon nods. The elder’s scheme ends. The bridge becomes safe again.
+
+And your name sits in the ledger like a legend.
+
+THE END (Good Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_mid: {
+        title: "Technically Proof",
+        text:
+`The dragon squints. "This is fake."
+
+Then it sighs. "But it proves the elder is lying. That counts."
+
+THE END (Mixed Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_wrong: {
+        title: "Wrong Answer",
+        text:
+`The dragon smiles politely.
+
+"Incorrect. Toll is doubled."
+
+THE END (Riddle Loss)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_caught: {
+        title: "Caught",
+        text:
+`The elder’s guards drag you out by the collar.
+
+The dragon later learns your story the hard way.
+
+THE END (Caught Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_broke: {
+        title: "No Toll, No Bridge",
+        text:
+`You walk away. Sometimes the heroic journey starts… later.
+
+THE END (Broke Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      }
+    }
+  },
+
+  // COMEDY
+  {
+    id: "comedy_sandwich_heist",
+    title: "Comedy: The Great Sandwich Heist",
+    genre: "Comedy",
+    blurb: "A legendary sandwich. A guarded fridge. Your dignity on the line.",
+    start: "breakroom",
+    initialState: { stats: { hp: 3, audacity: 0 }, flags: [], items: [] },
+    nodes: {
+      breakroom: {
+        title: "Office Breakroom",
+        text:
+`The fridge hums like it knows secrets. The legendary sandwich is inside.
+
+A sign reads: "DO NOT EAT. (SERIOUSLY.) —Janet"`,
+        choices: [
+          { text:"Open the fridge like a normal person.", to:"fridge", effects:{ addStats:{ audacity:+1 } } },
+          { text:"Wait for the coast to be clear.", to:"wait" },
+          { text:"Decide to be better. Walk away.", to:"end_goodish" }
+        ]
+      },
+      wait: {
+        title: "Reconnaissance",
+        text:
+`You lurk by the microwave, pretending to read nutrition facts.
+
+Janet's footsteps fade. The room is clear. Probably.`,
+        choices: [
+          { text:"Make your move.", to:"fridge", effects:{ addStats:{ audacity:+1 } } },
+          { text:"Overthink it and leave.", to:"end_goodish" }
+        ]
+      },
+      fridge: {
+        title: "The Fridge",
+        text:
+`Cold air hits your face. You see: leftovers, mystery containers, and…
+
+The sandwich. Wrapped like royalty.`,
+        choices: [
+          { text:"Take it immediately.", to:"alarm", effects:{ setFlags:["took_it"], addItems:["sandwich"] } },
+          { text:"Swap it with your sad salad to avoid suspicion.", to:"swap", effects:{ addStats:{ audacity:+1 } } },
+          { text:"Close the fridge. This is too much pressure.", to:"breakroom" }
+        ]
+      },
+      swap: {
+        title: "The Swap",
+        text:
+`You do the swap. Smooth. Professional.
+
+Unfortunately your salad container says in Sharpie: "PROPERTY OF ME."`,
+        choices: [
+          { text:"Commit to the lie anyway.", to:"escape", effects:{ addItems:["sandwich"], setFlags:["took_it"] } },
+          { text:"Panic and put everything back.", to:"end_caught" }
+        ]
+      },
+      alarm: {
+        title: "The Alarm",
+        text:
+`The breakroom door opens.
+
+Janet enters. She looks at you, then at the fridge, then at your hands.
+
+"Is that… my sandwich?"`,
+        choices: [
+          { text:"Lie boldly.", to:"lie", effects:{ addStats:{ audacity:+1 } } },
+          { text:"Confess immediately.", to:"confess" },
+          { text:"Offer to split it (peace treaty).", to:"split" }
+        ]
+      },
+      lie: {
+        title: "The Lie",
+        text:
+`"No," you say, with the confidence of a person holding the sandwich.
+
+Janet narrows her eyes. "Say the password."`,
+        choices: [
+          { text:"Make up a password. Any password.", to:"end_bad" },
+          { text:"Say: 'Teamwork makes the dream work.'", to:"end_caught" },
+          { text:"Say nothing. Maintain eye contact.", to:"end_mid", req:{ statMin:{ audacity:2 } } }
+        ]
+      },
+      confess: {
+        title: "Confession",
+        text:
+`You confess. Janet sighs like a tired queen.
+
+She considers your soul, then your hunger.`,
+        choices: [
+          { text:"Offer to replace it with something better.", to:"end_good", effects:{ setFlags:["redeemed"] } },
+          { text:"Offer a formal apology letter.", to:"end_mid" }
+        ]
+      },
+      split: {
+        title: "Split",
+        text:
+`You offer half. Janet stares. Then laughs.
+
+"Fine," she says. "But you owe me a coffee forever."`,
+        choices: [
+          { text:"Accept your delicious fate.", to:"end_good" }
+        ]
+      },
+      escape: {
+        title: "Escape Attempt",
+        text:
+`You pivot toward the hallway like a secret agent.
+
+The floor squeaks. Loudly. Like a betrayal.`,
+        choices: [
+          { text:"Run anyway.", to:"end_bad", effects:{ addStats:{ hp:-1 } } },
+          { text:"Walk casually like this is normal.", to:"end_mid" }
+        ]
+      },
+      end_good: {
+        title: "Honor Restored",
+        text:
+`You either replace the sandwich or negotiate peace.
+
+You live to snack another day.
+
+THE END (Good Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_goodish: {
+        title: "Moral Victory",
+        text:
+`You walk away. You are strong. You are wise.
+
+You are also hungry.
+
+THE END (Good-ish Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_mid: {
+        title: "Awkward Truce",
+        text:
+`Nobody wins, but everyone survives. Janet watches you forever now.
+
+THE END (Awkward Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_caught: {
+        title: "Caught",
+        text:
+`You panic. You fumble. You spill something on your shoe.
+
+Janet doesn't yell. Somehow that's worse.
+
+THE END (Caught Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      },
+      end_bad: {
+        title: "Sandwich Crime",
+        text:
+`You are escorted out of the breakroom like a disgraced celebrity.
+
+Somewhere, a fridge hums victoriously.
+
+THE END (Bad Ending)`,
+        choices: [{ text:"Back to shelf.", to:"__HOME__" }]
+      }
+    }
+  }
+];
+
+// -------------------- Engine --------------------
+let currentStory = null;   // object from LIBRARY
+let state = null;          // per-story runtime state
+
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+
+function storyKey(storyId){ return STORAGE_PREFIX + storyId; }
+
+function defaultState(story){
+  return {
+    nodeId: story.start,
+    history: [],
+    stats: deepClone(story.initialState.stats),
+    flags: new Set(story.initialState.flags),
+    items: new Set(story.initialState.items),
+    seenChoices: new Set()
+  };
+}
+
+function loadStoryState(story){
+  const raw = localStorage.getItem(storyKey(story.id));
+  if (!raw) return null;
+  try{
+    const p = JSON.parse(raw);
+    return {
+      nodeId: p.nodeId ?? story.start,
+      history: Array.isArray(p.history) ? p.history : [],
+      stats: p.stats ?? deepClone(story.initialState.stats),
+      flags: new Set(p.flags ?? []),
+      items: new Set(p.items ?? []),
+      seenChoices: new Set(p.seenChoices ?? [])
+    };
+  }catch{
+    return null;
+  }
+}
+
+function saveStoryState(){
+  if (!currentStory || !state) return;
+  const payload = {
+    nodeId: state.nodeId,
+    history: state.history,
+    stats: state.stats,
+    flags: Array.from(state.flags),
+    items: Array.from(state.items),
+    seenChoices: Array.from(state.seenChoices)
+  };
+  localStorage.setItem(storyKey(currentStory.id), JSON.stringify(payload));
+}
+
+function clearStoryProgress(storyId){
+  localStorage.removeItem(storyKey(storyId));
+}
+
+function clearAllProgress(){
+  for (const s of LIBRARY) clearStoryProgress(s.id);
+  flash("Cleared all progress.");
+  renderHome();
+}
+
+function canSeeChoice(choice){
+  const req = choice.req;
+  if (!req) return true;
+
+  if (req.flags) for (const f of req.flags) if (!state.flags.has(f)) return false;
+  if (req.notFlags) for (const f of req.notFlags) if (state.flags.has(f)) return false;
+  if (req.items) for (const it of req.items) if (!state.items.has(it)) return false;
+  if (req.statMin){
+    for (const [k,v] of Object.entries(req.statMin)){
+      if ((state.stats[k] ?? 0) < v) return false;
+    }
+  }
+  if (req.statMax){
+    for (const [k,v] of Object.entries(req.statMax)){
+      if ((state.stats[k] ?? 0) > v) return false;
+    }
+  }
+  if (choice.once){
+    const key = state.nodeId + "::" + choice.text;
+    if (state.seenChoices.has(key)) return false;
+  }
+  return true;
+}
+
+function applyEffects(effects){
+  if (!effects) return;
+  if (effects.setFlags) effects.setFlags.forEach(f => state.flags.add(f));
+  if (effects.clearFlags) effects.clearFlags.forEach(f => state.flags.delete(f));
+  if (effects.addItems) effects.addItems.forEach(it => state.items.add(it));
+  if (effects.removeItems) effects.removeItems.forEach(it => state.items.delete(it));
+  if (effects.addStats){
+    for (const [k,delta] of Object.entries(effects.addStats)){
+      state.stats[k] = (state.stats[k] ?? 0) + delta;
+    }
+  }
+}
+
+function startStory(storyId){
+  currentStory = LIBRARY.find(s => s.id === storyId);
+  if (!currentStory) return;
+
+  // resume if exists, otherwise new
+  state = loadStoryState(currentStory) ?? defaultState(currentStory);
+
+  showPlay();
+  renderNode();
+  flash(""); // clear footer
+}
+
+function restartStory(){
+  if (!currentStory) return;
+  clearStoryProgress(currentStory.id);
+  state = defaultState(currentStory);
+  renderNode();
+  flash("Restarted.");
+}
+
+function goHome(){
+  currentStory = null;
+  state = null;
+  renderHome();
+}
+
+function goToChoice(choice){
+  // Special pseudo-target for returning to home
+  if (choice.to === "__HOME__"){
+    saveStoryState();
+    return goHome();
+  }
+
+  const node = currentStory.nodes[state.nodeId];
+  const key = state.nodeId + "::" + choice.text;
+  if (choice.once) state.seenChoices.add(key);
+
+  state.history.push(state.nodeId);
+  applyEffects(choice.effects);
+  state.nodeId = choice.to;
+
+  // clamp hp if present
+  if (state.stats.hp != null) state.stats.hp = Math.max(0, state.stats.hp);
+
+  saveStoryState();
+  renderNode();
+}
+
+function back(){
+  if (!state?.history?.length) return;
+  state.nodeId = state.history.pop();
+  saveStoryState();
+  renderNode();
+}
+
+function flash(msg){
+  document.getElementById("footer").textContent = msg || "";
+}
+
+function showPlay(){
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("play").classList.remove("hidden");
+}
+
+function showHome(){
+  document.getElementById("play").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+
+function renderHome(){
+  showHome();
+  const grid = document.getElementById("storyGrid");
+  grid.innerHTML = "";
+
+  for (const story of LIBRARY){
+    const prog = loadStoryState(story);
+    const atStart = !prog || prog.nodeId === story.start;
+    const progressLabel = prog
+      ? (atStart ? "New / Start" : "Resume available")
+      : "New / Start";
+
+    const card = document.createElement("div");
+    card.className = "storyCard";
+    card.onclick = () => startStory(story.id);
+
+    const h = document.createElement("h2");
+    h.textContent = story.title;
+
+    const p = document.createElement("p");
+    p.textContent = story.blurb;
+
+    const tags = document.createElement("div");
+    tags.className = "tagRow";
+    tags.appendChild(tag(story.genre));
+    tags.appendChild(tag(progressLabel));
+
+    card.appendChild(h);
+    card.appendChild(p);
+    card.appendChild(tags);
+
+    grid.appendChild(card);
+  }
+}
+
+function tag(txt){
+  const d = document.createElement("div");
+  d.className = "tag";
+  d.textContent = txt;
+  return d;
+}
+
+function renderNode(){
+  const node = currentStory.nodes[state.nodeId];
+  if (!node){
+    document.getElementById("playTitle").textContent = currentStory.title;
+    document.getElementById("playSubtitle").textContent = "Missing node: " + state.nodeId;
+    document.getElementById("nodeText").textContent = "This node ID doesn't exist in the story.";
+    document.getElementById("choices").innerHTML = "";
+    return;
+  }
+
+  document.getElementById("playTitle").textContent = currentStory.title;
+  document.getElementById("playSubtitle").textContent = node.title;
+
+  // meta pills: show stats, items, flags (keep simple)
+  const meta = document.getElementById("meta");
+  meta.innerHTML = "";
+  const pills = [];
+
+  // show all stats dynamically
+  for (const [k,v] of Object.entries(state.stats || {})){
+    pills.push(`${k.toUpperCase()}: ${v}`);
+  }
+  pills.push(`Items: ${Array.from(state.items).join(", ") || "none"}`);
+  pills.push(`Flags: ${Array.from(state.flags).join(", ") || "none"}`);
+
+  for (const txt of pills){
+    const d = document.createElement("div");
+    d.className = "pill";
+    d.textContent = txt;
+    meta.appendChild(d);
+  }
+
+  document.getElementById("nodeText").textContent = node.text;
+
+  const choicesEl = document.getElementById("choices");
+  choicesEl.innerHTML = "";
+
+  const visible = (node.choices ?? []).filter(canSeeChoice);
+  if (!visible.length){
+    const p = document.createElement("p");
+    p.className = "muted";
+    p.textContent = "No choices available here (check requirements).";
+    choicesEl.appendChild(p);
+  } else {
+    for (const c of visible){
+      const b = document.createElement("button");
+      b.className = "choiceBtn";
+      b.textContent = "→ " + c.text;
+      b.onclick = () => goToChoice(c);
+      choicesEl.appendChild(b);
+    }
+  }
+
+  document.getElementById("btnBack").disabled = state.history.length === 0;
+}
+
+// -------------------- UI Wiring --------------------
+document.getElementById("btnHome").addEventListener("click", () => {
+  if (currentStory) saveStoryState();
+  goHome();
+});
+
+document.getElementById("btnClearAll").addEventListener("click", clearAllProgress);
+document.getElementById("btnBack").addEventListener("click", back);
+document.getElementById("btnRestart").addEventListener("click", restartStory);
+
+// Start at home
+renderHome();
+</script>
+</body>
+</html>
