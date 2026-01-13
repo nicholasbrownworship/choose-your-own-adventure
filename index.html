@@ -6,36 +6,21 @@
   <title>Star Wars: Dockside Dead Drop</title>
   <style>
     :root{
-      --bg:#0b0f14;
-      --panel:#121826;
-      --panel2:#0f1726;
-      --line:#243048;
-      --line2:#38507a;
-      --text:#e8eef6;
-      --muted:rgba(232,238,246,.72);
-      --muted2:rgba(232,238,246,.55);
-      --good:#7fffd4;
-      --warn:#ffdf7f;
-      --bad:#ff7f9a;
-      --accent:#7ab7ff;
+      --bg:#0b0f14; --panel:#121826; --panel2:#0f1726;
+      --line:#243048; --line2:#38507a;
+      --text:#e8eef6; --muted:rgba(232,238,246,.72);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
     body{ margin:0; background:var(--bg); color:var(--text); }
     .wrap{ max-width: 1080px; margin:0 auto; padding: 18px; }
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      margin-bottom: 12px;
-    }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
     .brand{ font-weight:900; letter-spacing:.3px; }
     .subbrand{ font-size:12px; opacity:.7; margin-top:2px; }
     .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
     button{
-      background: #162238;
-      border: 1px solid #2a3a58;
-      color: var(--text);
-      border-radius: 12px;
-      padding: 10px 12px;
-      cursor: pointer;
+      background:#162238; border:1px solid #2a3a58; color:var(--text);
+      border-radius:12px; padding:10px 12px; cursor:pointer;
       transition: transform .05s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
       user-select:none;
     }
@@ -44,122 +29,54 @@
     button.ghost{ background: transparent; }
     button.danger{ background:#2a1420; border-color:#5a2a40; }
     button.danger:hover{ background:#361a28; border-color:#7a3a56; }
-    button.good{ background:#102a22; border-color:#2a5a48; }
-    button.good:hover{ background:#163b30; border-color:#3f7a62; }
     button:disabled{ opacity:.45; cursor:not-allowed; }
-    .grid{
-      display:grid;
-      grid-template-columns: 1.25fr .75fr;
-      gap: 12px;
-    }
-    @media (max-width: 900px){
-      .grid{ grid-template-columns: 1fr; }
-    }
+
+    .grid{ display:grid; grid-template-columns: 1.25fr .75fr; gap:12px; }
+    @media (max-width: 900px){ .grid{ grid-template-columns:1fr; } }
+
     .card{
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 12px 34px rgba(0,0,0,.25);
+      background:var(--panel); border:1px solid var(--line); border-radius:16px;
+      padding:16px; box-shadow: 0 12px 34px rgba(0,0,0,.25);
     }
-    .cardTitle{ font-weight:900; letter-spacing:.2px; }
-    .muted{ opacity:.72; }
-    .divider{ height:1px; background:var(--line); margin: 12px 0; opacity:.8; }
-    .pillRow{ display:flex; gap:8px; flex-wrap:wrap; }
-    .pill{
-      background: #0b1220;
-      border: 1px solid #25314a;
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      opacity:.92;
-      user-select:none;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-    }
-    .pill b{ font-weight:800; }
-    .pill.good{ border-color:#2a5a48; }
-    .pill.warn{ border-color:#5a4b2a; }
-    .pill.bad{ border-color:#5a2a40; }
-    .storyText{
-      white-space: pre-wrap;
-      line-height: 1.6;
-      font-size: 16px;
-      margin: 12px 0 10px;
-    }
-    .choices{ display:grid; gap:10px; }
-    .choiceBtn{
-      width:100%;
-      text-align:left;
-      padding: 12px;
-      border-radius: 14px;
-      background: #101a2b;
-      border: 1px solid #243048;
-    }
-    .choiceBtn:hover{ background:#14203a; border-color:#38507a; }
-    .choiceMeta{
-      font-size: 12px;
-      opacity:.7;
-      margin-top: 6px;
-    }
-    .choiceLocked{
-      width:100%;
-      text-align:left;
-      padding: 12px;
-      border-radius: 14px;
-      background: #0e1421;
-      border: 1px dashed #2b3a56;
-      opacity:.6;
-      cursor:not-allowed;
-    }
-    .kpiGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .kpi{
-      background: var(--panel2);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 10px;
-    }
-    .kpi .label{ font-size: 12px; opacity:.7; }
-    .kpi .value{ font-size: 18px; font-weight: 900; margin-top: 2px; }
-    .sectionHead{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom: 8px;
-    }
-    details{
-      background: var(--panel2);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 10px 12px;
-    }
-    details summary{
-      cursor:pointer;
-      font-weight:800;
-      list-style:none;
-      user-select:none;
-    }
-    details summary::-webkit-details-marker{ display:none; }
-    .list{ margin: 8px 0 0; padding-left: 16px; color: var(--muted); }
-    .log{
-      max-height: 250px;
-      overflow:auto;
-      padding-right: 6px;
-    }
-    .logEntry{
-      background:#0e1421;
-      border:1px solid #22304a;
-      border-radius: 12px;
-      padding: 10px;
-      margin-bottom: 8px;
-    }
-    .logEntry .t{ font-weight:800; }
-    .logEntry .s{ font-size:12px; opacity:.7; margin-top:3px; }
-    .footerMsg{ margin-top: 10px; font-size: 12px; opacity:.65; }
-    .tagRow{ display:flex; gap:8px; flex-wrap:wrap; }
-    .tag{ background:#0b1220; border:1px solid #25314a; border-radius:999px; padding:5px 9px; font-size:12px; opacity:.9; }
+    .divider{ height:1px; background:var(--line); margin:12px 0; opacity:.8; }
+    .sectionHead{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
     .bigTitle{ font-size:18px; font-weight:900; letter-spacing:.2px; margin:0; }
     .small{ font-size:12px; opacity:.7; }
-    .hidden{ display:none; }
+    .pillRow{ display:flex; gap:8px; flex-wrap:wrap; }
+    .pill{
+      background:#0b1220; border:1px solid #25314a; border-radius:999px;
+      padding:6px 10px; font-size:12px; opacity:.92; user-select:none;
+    }
+    .storyText{ white-space:pre-wrap; line-height:1.6; font-size:16px; margin:12px 0 10px; }
+    .choices{ display:grid; gap:10px; }
+    .choiceBtn{
+      width:100%; text-align:left; padding:12px; border-radius:14px;
+      background:#101a2b; border:1px solid #243048;
+    }
+    .choiceBtn:hover{ background:#14203a; border-color:#38507a; }
+    .choiceMeta{ font-size:12px; opacity:.7; margin-top:6px; }
+    .choiceLocked{
+      width:100%; text-align:left; padding:12px; border-radius:14px;
+      background:#0e1421; border:1px dashed #2b3a56; opacity:.6;
+    }
+    .kpiGrid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; }
+    .kpi{ background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:10px; }
+    .kpi .label{ font-size:12px; opacity:.7; }
+    .kpi .value{ font-size:18px; font-weight:900; margin-top:2px; }
+
+    details{ background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:10px 12px; }
+    details summary{ cursor:pointer; font-weight:800; list-style:none; user-select:none; }
+    details summary::-webkit-details-marker{ display:none; }
+    .list{ margin:8px 0 0; padding-left:16px; color:var(--muted); }
+
+    .tagRow{ display:flex; gap:8px; flex-wrap:wrap; }
+    .tag{ background:#0b1220; border:1px solid #25314a; border-radius:999px; padding:5px 9px; font-size:12px; opacity:.9; }
+
+    .log{ max-height:250px; overflow:auto; padding-right:6px; }
+    .logEntry{ background:#0e1421; border:1px solid #22304a; border-radius:12px; padding:10px; margin-bottom:8px; }
+    .logEntry .t{ font-weight:800; }
+    .logEntry .s{ font-size:12px; opacity:.7; margin-top:3px; }
+    .footerMsg{ margin-top:10px; font-size:12px; opacity:.65; }
   </style>
 </head>
 <body>
@@ -167,18 +84,15 @@
     <div class="topbar">
       <div>
         <div class="brand">Dockside Dead Drop</div>
-        <div class="subbrand">A tense Star Wars port heist CYOA (single story)</div>
+        <div class="subbrand">Single-story Star Wars CYOA (robust engine)</div>
       </div>
       <div class="row">
         <button id="btnRestart" class="danger">Restart</button>
         <button id="btnClear" class="danger">Clear Progress</button>
-        <button id="btnExport" class="ghost">Export Save</button>
-        <button id="btnImport" class="ghost">Import Save</button>
       </div>
     </div>
 
     <div class="grid">
-      <!-- MAIN STORY -->
       <div class="card">
         <div class="sectionHead">
           <div>
@@ -199,30 +113,19 @@
         <div class="divider"></div>
 
         <div id="choices" class="choices"></div>
-
         <div id="footerMsg" class="footerMsg"></div>
       </div>
 
-      <!-- SIDEBAR -->
       <div class="card">
         <div class="sectionHead">
-          <div class="cardTitle">Run Status</div>
+          <div style="font-weight:900;">Run Status</div>
           <button id="btnHelp" class="ghost">Help</button>
         </div>
 
         <div class="kpiGrid">
-          <div class="kpi">
-            <div class="label">HP</div>
-            <div id="kpiHp" class="value"></div>
-          </div>
-          <div class="kpi">
-            <div class="label">Nerve</div>
-            <div id="kpiNerve" class="value"></div>
-          </div>
-          <div class="kpi">
-            <div class="label">Heat</div>
-            <div id="kpiHeat" class="value"></div>
-          </div>
+          <div class="kpi"><div class="label">HP</div><div id="kpiHp" class="value"></div></div>
+          <div class="kpi"><div class="label">Nerve</div><div id="kpiNerve" class="value"></div></div>
+          <div class="kpi"><div class="label">Heat</div><div id="kpiHeat" class="value"></div></div>
         </div>
 
         <div class="divider"></div>
@@ -244,991 +147,620 @@
         <details open>
           <summary>Endings</summary>
           <div class="tagRow" id="endingTags" style="margin-top:10px;"></div>
-          <div class="small" style="margin-top:10px;">
-            Endings found are stored locally.
-          </div>
+          <div class="small" style="margin-top:10px;">Endings found are stored locally.</div>
         </details>
 
         <div class="divider"></div>
 
         <div class="sectionHead">
-          <div class="cardTitle">Journal</div>
+          <div style="font-weight:900;">Journal</div>
           <button id="btnClearLog" class="ghost">Clear</button>
         </div>
         <div id="log" class="log"></div>
-
-        <div class="divider"></div>
-
-        <div class="small">
-          Tip: Some choices unlock only if you gathered intel or kept your heat low.
-        </div>
       </div>
     </div>
   </div>
 
 <script>
-/*
-  Robust single-story CYOA engine
-  Features:
-  - Inventory + Flags + Stats that meaningfully gate choices
-  - Backtracking (history)
-  - Auto-save to localStorage
-  - Export / Import save JSON
-  - Journal log of decisions + outcomes
-  - Ending tracker (per ending id)
-  - Choice requirements displayed (and locked choices shown)
-*/
+(function(){
+  "use strict";
 
-const STORAGE_KEY = "dockside_dead_drop_v2::save";
-const ENDING_KEY  = "dockside_dead_drop_v2::endings";
+  var STORAGE_KEY = "dockside_dead_drop_v3::save";
+  var ENDING_KEY  = "dockside_dead_drop_v3::endings";
 
-// ----------- Story Data -----------
-const STORY = {
-  title: "Star Wars: Dockside Dead Drop",
-  subtitle: "Swap the case at Dock 9. Do not open it.",
-  start: "cold_open",
-  initialState: {
-    nodeId: "cold_open",
-    history: [],
-    stats: { hp: 3, nerve: 0, heat: 0 },
-    items: [],
-    flags: [],
-    seenOnce: [],
-    log: []
-  },
-
-  nodes: {
-    cold_open: {
-      title: "Dock 9",
-      subtitle: "One minute. A courier droid. Too many watchers.",
-      text:
+  // -------- Story --------
+  var STORY = {
+    start: "cold_open",
+    initialState: {
+      nodeId: "cold_open",
+      history: [],
+      stats: { hp: 3, nerve: 0, heat: 0 },
+      items: [],
+      flags: [],
+      seenOnce: [],
+      log: []
+    },
+    nodes: {
+      cold_open: {
+        title: "Dock 9",
+        subtitle: "One minute. A courier droid. Too many watchers.",
+        text:
 "You smell coolant, hot metal, and bad decisions.\n\nDock 9 is loud enough to hide a mistake, but quiet enough to remember it later.\n\nYour comm chirps once:\nSWAP THE CASE. DO NOT OPEN IT.\n\nAcross the bay: a courier droid with a matching case. A ship cycles out in one minute.\n\nIn the reflections of polished cargo plating, you catch movement. Three different kinds of attention.\n\nYou have time for one smart thing.",
-      choices: [
-        {
-          id:"walk_normal",
-          text:"Walk normal and close the distance.",
-          to:"approach",
-          effects:{ addStats:{ nerve:+1 } },
-          note:"+1 Nerve"
-        },
-        {
-          id:"circle_scan",
-          text:"Circle wide and map the eyes on you.",
-          to:"scan",
-          effects:{ addStats:{ nerve:+1 } },
-          note:"+1 Nerve, unlocks better options"
-        },
-        {
-          id:"abort",
-          text:"Abort. Leave the dock now.",
-          to:"end_abort",
-          ending:"abort"
-        }
-      ]
-    },
+        choices: [
+          { id:"walk_normal", text:"Walk normal and close the distance.", to:"approach", effects:{ addStats:{ nerve:+1 } }, note:"+1 Nerve" },
+          { id:"circle_scan", text:"Circle wide and map the eyes on you.", to:"scan", effects:{ addStats:{ nerve:+1 } }, note:"+1 Nerve (unlocks better routes)" },
+          { id:"abort", text:"Abort. Leave the dock now.", to:"end_abort", ending:"abort" }
+        ]
+      },
 
-    scan: {
-      title: "Three Sets of Eyes",
-      subtitle: "Imperial, criminal, and something quieter.",
-      text:
-"You use the crowd as cover and take the long angle.\n\n1) Two stormtroopers near a customs pillar, pretending their helmets are casual.\n2) A Rodian leaning on a crate, hands visible, eyes not.\n3) A cloaked figure where the light refuses to sit.\n\nThey're not watching the dock.\n\nThey're watching the moment.\n\nIf you control where the moment happens, you control what it costs.",
-      choices: [
-        {
-          id:"drop_decoy",
-          text:"Tag the Rodian with a decoy route (feed greed).",
-          to:"approach",
-          effects:{ setFlags:["decoy_plan"], addStats:{ nerve:+1 } },
-          note:"Sets decoy_plan, +1 Nerve"
-        },
-        {
-          id:"bait_troopers",
-          text:"Step into the troopers' line of sight on purpose (bait).",
-          to:"trooper_line",
-          effects:{ addStats:{ heat:+1 } },
-          note:"+1 Heat"
-        },
-        {
-          id:"go_now",
-          text:"Ignore them. Approach the courier droid.",
-          to:"approach"
-        }
-      ]
-    },
+      scan: {
+        title: "Three Sets of Eyes",
+        subtitle: "Imperial, criminal, and something quieter.",
+        text:
+"You use the crowd as cover and take the long angle.\n\n1) Two stormtroopers near a customs pillar.\n2) A Rodian leaning on a crate, smiling too much.\n3) A cloaked figure where the light refuses to sit.\n\nThey're not watching the dock.\n\nThey're watching the moment.\n\nIf you control where the moment happens, you control what it costs.",
+        choices: [
+          { id:"drop_decoy", text:"Tag the Rodian with a decoy route (feed greed).", to:"approach",
+            effects:{ setFlags:["decoy_plan"], addStats:{ nerve:+1 } }, note:"Sets decoy_plan, +1 Nerve" },
+          { id:"bait_troopers", text:"Step into the troopers' line of sight on purpose (bait).", to:"trooper_line",
+            effects:{ addStats:{ heat:+1 } }, note:"+1 Heat" },
+          { id:"go_now", text:"Ignore them. Approach the courier droid.", to:"approach" }
+        ]
+      },
 
-    trooper_line: {
-      title: "Bold",
-      subtitle: "You are now a person worth noticing.",
-      text:
+      trooper_line: {
+        title: "Bold",
+        subtitle: "You are now a person worth noticing.",
+        text:
 "One trooper turns his helmet toward you.\n\nThe other touches his comlink.\n\nYou didn't get stopped.\n\nYou got marked.\n\nSometimes the difference is just how long you get to breathe.",
-      choices: [
-        { id:"keep_walking", text:"Keep walking like you're supposed to be here.", to:"approach", effects:{ addStats:{ nerve:+1 } }, note:"+1 Nerve" },
-        { id:"vanish", text:"Vanish into cargo shadows and reset the angle.", to:"shadow_lane_setup", effects:{ addStats:{ heat:-1 } }, note:"-1 Heat" }
-      ]
-    },
+        choices: [
+          { id:"keep_walking", text:"Keep walking like you're supposed to be here.", to:"approach", effects:{ addStats:{ nerve:+1 } }, note:"+1 Nerve" },
+          { id:"vanish", text:"Vanish into cargo shadows and reset the angle.", to:"shadow_lane_setup", effects:{ addStats:{ heat:-1 } }, note:"-1 Heat" }
+        ]
+      },
 
-    approach: {
-      title: "The Courier Droid",
-      subtitle: "Swap clean. No drama. No curiosity.",
-      text:
-"The courier droid rolls toward a marked crate and stops.\n\nIts optics brighten as if it's receiving a silent instruction.\n\nThe case on its chassis has your symbol burned into the latch.\n\nYou can do this fast.\n\nOr you can do this smart.\n\nBehind you, you feel the crowd become a net.",
-      choices: [
-        {
-          id:"swap_fast",
-          text:"Swap cases immediately (speed).",
-          to:"swap",
-          effects:{ addStats:{ heat:+1 } },
-          note:"+1 Heat (people notice quick hands)"
-        },
-        {
-          id:"weight_check",
-          text:"Do a quick weight-check first (smart).",
-          to:"weight_check",
-          effects:{ addStats:{ nerve:+1 } },
-          note:"+1 Nerve"
-        },
-        {
-          id:"talk_droid",
-          text:"Talk to the droid (wastes time, might gain intel).",
-          to:"talk_droid",
-          effects:{ addStats:{ heat:+1 } },
-          note:"+1 Heat"
-        }
-      ]
-    },
+      approach: {
+        title: "The Courier Droid",
+        subtitle: "Swap clean. No drama. No curiosity.",
+        text:
+"The courier droid stops by a marked crate.\n\nIts optics brighten as if it received a silent instruction.\n\nThe case on its chassis has your symbol burned into the latch.\n\nYou can do this fast.\n\nOr you can do this smart.\n\nBehind you, you feel the crowd become a net.",
+        choices: [
+          { id:"swap_fast", text:"Swap cases immediately (speed).", to:"swap", effects:{ addStats:{ heat:+1 } }, note:"+1 Heat" },
+          { id:"weight_check", text:"Do a quick weight-check first (smart).", to:"weight_check", effects:{ addStats:{ nerve:+1 } }, note:"+1 Nerve" },
+          { id:"talk_droid", text:"Talk to the droid (might gain intel).", to:"talk_droid", effects:{ addStats:{ heat:+1 } }, note:"+1 Heat" }
+        ]
+      },
 
-    talk_droid: {
-      title: "The Droid Answers",
-      subtitle: "It knows more than it should.",
-      text:
-"You lean close and whisper:\n'Who told you to come here?'\n\nThe droid replies in a flat voice:\n'IF YOU OPEN THE CASE, IT OPENS YOU.'\n\nA warning.\n\nOr a dare.\n\nThe droid swivels slightly, optics tracking something behind you.",
-      choices: [
-        { id:"swap_now", text:"Swap now. Do the job.", to:"swap", effects:{ setFlags:["droid_warning"] }, note:"Sets droid_warning" },
-        { id:"shadow_reset", text:"Step away and reset through the service lane.", to:"shadow_lane_setup", effects:{ setFlags:["droid_warning"], addStats:{ heat:-1 } }, note:"Sets droid_warning, -1 Heat" }
-      ]
-    },
+      talk_droid: {
+        title: "The Droid Answers",
+        subtitle: "It knows more than it should.",
+        text:
+"You lean close and whisper: 'Who told you to come here?'\n\nThe droid replies:\nIF YOU OPEN THE CASE, IT OPENS YOU.\n\nA warning.\n\nOr a dare.\n\nThe optics swivel. It's tracking something behind you.",
+        choices: [
+          { id:"swap_now", text:"Swap now. Do the job.", to:"swap", effects:{ setFlags:["droid_warning"] }, note:"Sets droid_warning" },
+          { id:"shadow_reset", text:"Step away and reset through the service lane.", to:"shadow_lane_setup",
+            effects:{ setFlags:["droid_warning"], addStats:{ heat:-1 } }, note:"Sets droid_warning, -1 Heat" }
+        ]
+      },
 
-    weight_check: {
-      title: "Wrong Weight",
-      subtitle: "Too light. Too clean. Too intentional.",
-      text:
-"You lift the case a centimeter.\n\nToo light.\n\nThat means one of three things:\n- The payload is not physical.\n- The payload is already gone.\n- This is bait.\n\nThe droid's optics brighten.\n\nSomewhere nearby, a blaster safety clicks off.\n\nIf you play this right, you can turn a setup into a lever.",
-      choices: [
-        {
-          id:"swap_anyway",
-          text:"Swap anyway. Complete the contract.",
-          to:"swap",
-          effects:{ addStats:{ heat:+1 } },
-          note:"+1 Heat"
-        },
-        {
-          id:"grab_droid",
-          text:"Grab the droid and pull it under cover (risk, high reward).",
-          to:"grab_droid",
-          req:{ statMin:{ nerve:2 } },
-          effects:{ addStats:{ heat:+2 } },
-          note:"Requires Nerve 2, +2 Heat"
-        },
-        {
-          id:"abort_here",
-          text:"Signal abort and walk away alive.",
-          to:"end_abort",
-          ending:"abort"
-        }
-      ]
-    },
+      weight_check: {
+        title: "Wrong Weight",
+        subtitle: "Too light. Too clean. Too intentional.",
+        text:
+"You lift the case a centimeter.\n\nToo light.\n\nThat means one of three things:\n- The payload is not physical.\n- The payload is already gone.\n- This is bait.\n\nSomewhere nearby, a blaster safety clicks off.\n\nIf you play this right, you can turn a setup into a lever.",
+        choices: [
+          { id:"swap_anyway", text:"Swap anyway. Complete the contract.", to:"swap", effects:{ addStats:{ heat:+1 } }, note:"+1 Heat" },
+          { id:"grab_droid", text:"Grab the droid and pull it under cover (risk, reward).", to:"grab_droid",
+            req:{ statMin:{ nerve:2 } }, effects:{ addStats:{ heat:+2 } }, note:"Needs Nerve>=2, +2 Heat" },
+          { id:"abort_here", text:"Signal abort and walk away alive.", to:"end_abort", ending:"abort" }
+        ]
+      },
 
-    grab_droid: {
-      title: "You Grab The Droid",
-      subtitle: "Under the plating. Behind the story.",
-      text:
-"You seize the droid and yank it behind a cargo stack.\n\nPanels pop.\n\nInside: a transmitter pack and a tiny blinking red module.\n\nNot a payload.\n\nA beacon.\n\nA countdown.\n\nThis wasn't delivery.\n\nThis was blame.\n\nYou have seconds to decide what kind of professional you are.",
-      choices: [
-        {
-          id:"dump_beacon",
-          text:"Rip the beacon out, toss it into the open, and run.",
-          to:"shadow_lane_escape",
-          effects:{ setFlags:["dumped_beacon","setup_confirmed"], addStats:{ hp:-1 } },
-          note:"Sets dumped_beacon + setup_confirmed, -1 HP"
-        },
-        {
-          id:"keep_beacon",
-          text:"Keep the beacon. Use it as leverage (dangerous).",
-          to:"leverage_path",
-          effects:{ setFlags:["kept_beacon","setup_confirmed"], addStats:{ heat:+1 } },
-          note:"Sets kept_beacon + setup_confirmed, +1 Heat"
-        }
-      ]
-    },
+      grab_droid: {
+        title: "You Grab The Droid",
+        subtitle: "Under the plating. Behind the story.",
+        text:
+"You yank the droid behind a cargo stack.\n\nPanels pop.\n\nInside: a transmitter pack and a tiny blinking red module.\n\nNot a payload.\n\nA beacon.\n\nA countdown.\n\nThis wasn't delivery.\n\nThis was blame.",
+        choices: [
+          { id:"dump_beacon", text:"Rip the beacon out, toss it into the open, and run.", to:"shadow_lane_escape",
+            effects:{ setFlags:["dumped_beacon","setup_confirmed"], addStats:{ hp:-1 } }, note:"Sets dumped_beacon + setup_confirmed, -1 HP" },
+          { id:"keep_beacon", text:"Keep the beacon. Use it as leverage (dangerous).", to:"leverage_path",
+            effects:{ setFlags:["kept_beacon","setup_confirmed"], addStats:{ heat:+1 } }, note:"Sets kept_beacon + setup_confirmed, +1 Heat" }
+        ]
+      },
 
-    swap: {
-      title: "The Swap",
-      subtitle: "Hands like practiced betrayal.",
-      text:
-"Case down. Case up. Latch click.\n\nFor half a second, you think you got away with it.\n\nThen the cloaked figure speaks behind you:\n'Wrong case.'\n\nThe Rodian stops pretending.\n\nThe troopers start walking.\n\nThe dock suddenly feels smaller.\n\nYou get to choose how the story moves now.",
-      choices: [
-        {
-          id:"run_hatch",
-          text:"Run for the service hatch (fast exit).",
-          to:"shadow_lane_escape",
-          effects:{ addStats:{ hp:-1, heat:+1 } },
-          note:"-1 HP, +1 Heat"
-        },
-        {
-          id:"bluff",
-          text:"Bluff: 'You sure about that?'",
-          to:"bluff",
-          effects:{ addStats:{ nerve:+1 } },
-          note:"+1 Nerve"
-        },
-        {
-          id:"handoff_cloak",
-          text:"Hand the case to the cloaked figure (test the angle).",
-          to:"handoff",
-          effects:{ addStats:{ heat:+1 } },
-          note:"+1 Heat"
-        }
-      ]
-    },
+      swap: {
+        title: "The Swap",
+        subtitle: "Hands like practiced betrayal.",
+        text:
+"Case down. Case up. Latch click.\n\nFor half a second, you think you got away with it.\n\nThen the cloaked figure speaks behind you:\nWrong case.\n\nThe Rodian stops pretending.\n\nThe troopers start walking.\n\nThe dock suddenly feels smaller.",
+        choices: [
+          { id:"run_hatch", text:"Run for the service hatch (fast exit).", to:"shadow_lane_escape", effects:{ addStats:{ hp:-1, heat:+1 } }, note:"-1 HP, +1 Heat" },
+          { id:"bluff", text:"Bluff: 'You sure about that?'", to:"bluff", effects:{ addStats:{ nerve:+1 } }, note:"+1 Nerve" },
+          { id:"handoff_cloak", text:"Hand the case to the cloaked figure (test the angle).", to:"handoff", effects:{ addStats:{ heat:+1 } }, note:"+1 Heat" }
+        ]
+      },
 
-    bluff: {
-      title: "The Bluff",
-      subtitle: "Four seconds of narrative control.",
-      text:
-"You hold the case like it's nothing.\n\nThe cloaked figure tilts their head.\n\nThe Rodian smiles.\n\nThe troopers close distance.\n\nYou notice something: the Rodian is watching the troopers more than he's watching you.\n\nHe's scared of them.\n\nFear is a handle.",
-      choices: [
-        {
-          id:"throw_case",
-          text:"Throw the case onto a cargo sled and kick it downlane (chaos).",
-          to:"chaos_case",
-          effects:{ setFlags:["case_loose"], addStats:{ heat:+2 } },
-          note:"Sets case_loose, +2 Heat"
-        },
-        {
-          id:"rodian_deal",
-          text:"Offer the Rodian a split to block the troopers (dirty teamwork).",
-          to:"rodian_deal",
-          req:{ statMin:{ nerve:2 } },
-          effects:{ addStats:{ heat:+1 } },
-          note:"Requires Nerve 2, +1 Heat"
-        },
-        {
-          id:"call_troopers",
-          text:"Surrender to the troopers (survive, lose the game).",
-          to:"end_cuffed",
-          ending:"cuffed"
-        }
-      ]
-    },
+      bluff: {
+        title: "The Bluff",
+        subtitle: "Four seconds of narrative control.",
+        text:
+"You hold the case like it's nothing.\n\nThe cloaked figure tilts their head.\n\nThe Rodian smiles.\n\nThe troopers close distance.\n\nYou notice something: the Rodian is watching the troopers more than he's watching you.\n\nFear is a handle.",
+        choices: [
+          { id:"throw_case", text:"Kick the case downlane (chaos).", to:"chaos_case", effects:{ setFlags:["case_loose"], addStats:{ heat:+2 } }, note:"Sets case_loose, +2 Heat" },
+          { id:"rodian_deal", text:"Offer the Rodian a split to block the troopers.", to:"rodian_deal", req:{ statMin:{ nerve:2 } },
+            effects:{ addStats:{ heat:+1 } }, note:"Needs Nerve>=2, +1 Heat" },
+          { id:"surrender", text:"Surrender to the troopers.", to:"end_cuffed", ending:"cuffed" }
+        ]
+      },
 
-    rodian_deal: {
-      title: "Rodian Deal",
-      subtitle: "Greed beats loyalty every time.",
-      text:
-"You flash credits.\n\nHe flashes teeth.\n\nHe steps into the troopers' path and starts a loud argument about shipping permits.\n\nIt is beautiful.\n\nIt buys you a window.\n\nThe cloaked figure doesn't move.\n\nThat is more frightening than any blaster.",
-      choices: [
-        {
-          id:"slip_hatch",
-          text:"Slip into the service lane with the case.",
-          to:"shadow_lane_escape",
-          effects:{ setFlags:["rodian_block"], addStats:{ nerve:+1 } },
-          note:"Sets rodian_block, +1 Nerve"
-        },
-        {
-          id:"open_case",
-          text:"Use the chaos to open the case (curiosity tax).",
-          to:"end_opened",
-          ending:"opened"
-        }
-      ]
-    },
+      rodian_deal: {
+        title: "Rodian Deal",
+        subtitle: "Greed beats loyalty every time.",
+        text:
+"You flash credits.\n\nHe flashes teeth.\n\nHe blocks the troopers with a loud argument about permits.\n\nIt is beautiful.\n\nIt buys you a window.",
+        choices: [
+          { id:"slip_hatch", text:"Slip into the service lane with the case.", to:"shadow_lane_escape", effects:{ setFlags:["rodian_block"], addStats:{ nerve:+1 } }, note:"Sets rodian_block, +1 Nerve" },
+          { id:"open_case", text:"Open the case (curiosity tax).", to:"end_opened", ending:"opened" }
+        ]
+      },
 
-    handoff: {
-      title: "The Handoff",
-      subtitle: "You were never meant to deliver.",
-      text:
-"You extend the case.\n\nThe cloaked figure doesn't take it.\n\nThey look at your hands and say quietly:\n'You're not the courier.'\n\nAnd now you understand: you were never meant to deliver.\n\nYou were meant to be blamed.\n\nBehind the cloaked figure, the troopers close in.\n\nIf you want out, it will be expensive.",
-      choices: [
-        {
-          id:"take_back_run",
-          text:"Snatch it back and run (messy).",
-          to:"shadow_lane_escape",
-          effects:{ addStats:{ hp:-1, heat:+1 }, setFlags:["setup_confirmed"] },
-          note:"-1 HP, +1 Heat, sets setup_confirmed"
-        },
-        {
-          id:"walk_alive",
-          text:"Let it go. Walk away alive (professional cowardice).",
-          to:"end_abort",
-          ending:"abort"
-        },
-        {
-          id:"ask_question",
-          text:"Ask: 'Who set me up?'",
-          to:"hook_follow",
-          req:{ flags:["droid_warning"] },
-          effects:{ addStats:{ nerve:+1 } },
-          note:"Requires droid_warning, +1 Nerve"
-        }
-      ]
-    },
+      handoff: {
+        title: "The Handoff",
+        subtitle: "You were meant to be blamed.",
+        text:
+"You extend the case.\n\nThe cloaked figure doesn't take it.\n\nThey say quietly:\nYou're not the courier.\n\nAnd now you understand: you were never meant to deliver.\n\nYou were meant to be blamed.",
+        choices: [
+          { id:"take_back_run", text:"Snatch it back and run (messy).", to:"shadow_lane_escape",
+            effects:{ addStats:{ hp:-1, heat:+1 }, setFlags:["setup_confirmed"] }, note:"-1 HP, +1 Heat, sets setup_confirmed" },
+          { id:"walk_alive", text:"Let it go. Walk away alive.", to:"end_abort", ending:"abort" },
+          { id:"ask_question", text:"Ask: 'Who set me up?'", to:"hook_follow", req:{ flags:["droid_warning"] }, effects:{ addStats:{ nerve:+1 } }, note:"Needs droid_warning, +1 Nerve" }
+        ]
+      },
 
-    chaos_case: {
-      title: "Case Loose",
-      subtitle: "Everyone lunges. One person doesn't.",
-      text:
-"The case skids across the deck, spinning like a bad idea.\n\nTroopers shout.\n\nThe Rodian laughs.\n\nWorkers scramble.\n\nThe cloaked figure does not move.\n\nYou realize the cloaked figure already knows where it will land.\n\nIf you follow them, you might learn the truth.\n\nIf you run, you might keep your life simple.",
-      choices: [
-        {
-          id:"follow_cloak",
-          text:"Follow the cloaked figure (truth > safety).",
-          to:"hook_follow",
-          effects:{ addStats:{ nerve:+1 } },
-          note:"+1 Nerve"
-        },
-        {
-          id:"run_other",
-          text:"Run the other way and disappear.",
-          to:"shadow_lane_escape",
-          effects:{ addStats:{ hp:-1 } },
-          note:"-1 HP"
-        }
-      ]
-    },
+      chaos_case: {
+        title: "Case Loose",
+        subtitle: "Everyone lunges. One person doesn't.",
+        text:
+"The case skids across the deck.\n\nTroopers shout.\n\nWorkers scramble.\n\nThe cloaked figure does not move.\n\nThey already know where it will land.",
+        choices: [
+          { id:"follow_cloak", text:"Follow the cloaked figure (truth > safety).", to:"hook_follow", effects:{ addStats:{ nerve:+1 } }, note:"+1 Nerve" },
+          { id:"run_other", text:"Run the other way and disappear.", to:"shadow_lane_escape", effects:{ addStats:{ hp:-1 } }, note:"-1 HP" }
+        ]
+      },
 
-    shadow_lane_setup: {
-      title: "Cargo Shadows",
-      subtitle: "A quieter angle. A better exit.",
-      text:
-"You slip behind stacked containers.\n\nThe dock noise becomes muffled.\n\nYou spot a service lane hatch half-hidden under a net of cables.\n\nIf this goes bad, that hatch is your oxygen.\n\nYou can re-approach the droid from cover, or set a trap.",
-      choices: [
-        {
-          id:"reapproach",
-          text:"Re-approach the courier droid from cover.",
-          to:"approach",
-          effects:{ setFlags:["found_hatch"] },
-          note:"Sets found_hatch"
-        },
-        {
-          id:"plant_marker",
-          text:"Plant a decoy marker on a random worker cart (misdirection).",
-          to:"approach",
-          req:{ flags:["decoy_plan"] },
-          effects:{ setFlags:["decoy_active"], addStats:{ heat:-1 } },
-          note:"Requires decoy_plan, sets decoy_active, -1 Heat"
-        }
-      ]
-    },
+      shadow_lane_setup: {
+        title: "Cargo Shadows",
+        subtitle: "A quieter angle. A better exit.",
+        text:
+"You slip behind stacked containers.\n\nYou spot a service lane hatch half-hidden under cables.\n\nIf this goes bad, that hatch is oxygen.\n\nYou can re-approach, or activate the decoy plan.",
+        choices: [
+          { id:"reapproach", text:"Re-approach the droid from cover.", to:"approach", effects:{ setFlags:["found_hatch"] }, note:"Sets found_hatch" },
+          { id:"plant_marker", text:"Activate the decoy plan.", to:"approach", req:{ flags:["decoy_plan"] },
+            effects:{ setFlags:["decoy_active"], addStats:{ heat:-1 } }, note:"Needs decoy_plan, sets decoy_active, -1 Heat" }
+        ]
+      },
 
-    shadow_lane_escape: {
-      title: "Service Lane",
-      subtitle: "Pipes, cables, and choices that bite.",
-      text:
-"You dive into the service lane.\n\nBehind you: boots.\n\nAhead: a maintenance hatch.\n\nA sign reads: AUTHORIZED PERSONNEL ONLY.\n\nPerfect. You're unauthorized in spirit, too.\n\nIf you kept heat low, you might slip clean.\n\nIf not, you will have to pay in blood or secrets.",
-      choices: [
-        {
-          id:"force_hatch",
-          text:"Force the hatch and slip inside.",
-          to:"end_escape",
-          effects:{ addStats:{ hp:-1 } },
-          note:"-1 HP"
-        },
-        {
-          id:"clean_slip",
-          text:"Slip through quietly while they argue outside (clean).",
-          to:"end_escape_clean",
-          req:{ statMax:{ heat:1 } },
-          effects:{ addStats:{ nerve:+1 } },
-          note:"Requires Heat 1 or less, +1 Nerve"
-        },
-        {
-          id:"ambush",
-          text:"Turn and ambush whoever follows (risky).",
-          to:"end_ambush",
-          req:{ statMin:{ nerve:2 } },
-          effects:{ addStats:{ hp:-1, heat:+1 } },
-          note:"Requires Nerve 2, -1 HP, +1 Heat"
-        }
-      ]
-    },
+      shadow_lane_escape: {
+        title: "Service Lane",
+        subtitle: "Pipes, cables, and choices that bite.",
+        text:
+"You dive into the service lane.\n\nBehind you: boots.\n\nAhead: a maintenance hatch.\n\nIf heat stays low, you can slip clean.\n\nIf not, you pay in blood or secrets.",
+        choices: [
+          { id:"force_hatch", text:"Force the hatch and slip inside.", to:"end_escape", effects:{ addStats:{ hp:-1 } }, note:"-1 HP" },
+          { id:"clean_slip", text:"Slip through quietly (clean).", to:"end_escape_clean", req:{ statMax:{ heat:1 } },
+            effects:{ addStats:{ nerve:+1 } }, note:"Needs Heat<=1, +1 Nerve" },
+          { id:"ambush", text:"Turn and ambush whoever follows.", to:"end_ambush", req:{ statMin:{ nerve:2 } },
+            effects:{ addStats:{ hp:-1, heat:+1 } }, note:"Needs Nerve>=2, -1 HP, +1 Heat" }
+        ]
+      },
 
-    leverage_path: {
-      title: "Leverage",
-      subtitle: "Everyone wants you alive. That can be protection.",
-      text:
-"You keep the beacon.\n\nNow every faction wants you alive.\n\nNot for mercy.\n\nFor control.\n\nYour comm chirps again, different channel:\n'If you have the red module, you have ten seconds to decide who you want as an enemy.'\n\nYou can trade the beacon to:\n- The cloaked figure (unknown).\n- The Rodian (predictable).\n- The troopers (legal trouble).\n\nOr you can keep running and let everyone chase the wrong story.",
-      choices: [
-        {
-          id:"trade_cloak",
-          text:"Trade the beacon to the cloaked figure (truth).",
-          to:"end_hook",
-          effects:{ setFlags:["traded_cloak"] },
-          ending:"hook"
-        },
-        {
-          id:"trade_rodian",
-          text:"Trade it to the Rodian (credits).",
-          to:"end_leverage",
-          effects:{ addStats:{ heat:+1 }, setFlags:["paid_off"] },
-          ending:"leverage"
-        },
-        {
-          id:"trade_troopers",
-          text:"Hand it to the troopers (survive, lose your freedom).",
-          to:"end_cuffed",
-          effects:{ addStats:{ heat:-1 } },
-          ending:"cuffed"
-        }
-      ]
-    },
+      leverage_path: {
+        title: "Leverage",
+        subtitle: "Everyone wants you alive. That can be protection.",
+        text:
+"You keep the beacon.\n\nNow every faction wants you alive.\n\nYour comm chirps on a different channel:\nIf you have the red module, you have ten seconds to decide who you want as an enemy.\n\nYou can trade the beacon...\n\n...or keep moving and let everyone chase the wrong story.",
+        choices: [
+          { id:"trade_cloak", text:"Trade to the cloaked figure (truth).", to:"end_hook", ending:"hook" },
+          { id:"trade_rodian", text:"Trade to the Rodian (credits).", to:"end_leverage", ending:"leverage" },
+          { id:"trade_troopers", text:"Hand it to the troopers (freedom loss).", to:"end_cuffed", ending:"cuffed" }
+        ]
+      },
 
-    hook_follow: {
-      title: "A Door That Wasn't There",
-      subtitle: "The story chooses you back.",
-      text:
-"You follow the cloaked figure through the chaos.\n\nThey lead you to a maintenance door that should not exist.\n\nIt opens anyway.\n\nInside: a quiet corridor with no cameras.\n\nThe figure turns, and you see a scar you recognize.\n\nNot because you know them.\n\nBecause you've seen it on your own face.\n\nThey say, almost kindly:\n'Now we can talk about who set you up.'",
-      choices: [
-        {
-          id:"step_in",
-          text:"Step inside and hear the truth.",
-          to:"end_hook",
-          effects:{ addStats:{ nerve:+1 }, setFlags:["took_meeting"] },
-          ending:"hook"
-        },
-        {
-          id:"refuse",
-          text:"Refuse. Walk away before the universe adds more clauses.",
-          to:"end_abort",
-          ending:"abort"
-        }
-      ]
-    },
+      hook_follow: {
+        title: "A Door That Wasn't There",
+        subtitle: "A bigger game begins.",
+        text:
+"You follow the only person not panicking.\n\nThey lead you to a maintenance door that should not exist.\n\nIt opens anyway.\n\nInside: quiet.\n\nThe figure turns.\n\nYou see a scar you recognize.\n\nNot because you know them.\n\nBecause you've seen it on your own face.\n\nThey say:\nNow we can talk about who set you up.",
+        choices: [
+          { id:"accept", text:"Step inside and hear the truth.", to:"end_hook", ending:"hook" },
+          { id:"refuse", text:"Refuse. Walk away before the universe adds clauses.", to:"end_abort", ending:"abort" }
+        ]
+      },
 
-    // ----------- Endings -----------
-    end_escape: {
-      title: "Escape",
-      subtitle: "You get tomorrow. Not answers.",
-      text:
+      end_escape: {
+        title: "Escape",
+        subtitle: "You get tomorrow. Not answers.",
+        text:
 "You disappear into the port's infrastructure.\n\nSomebody else gets blamed.\n\nSomebody else gets paid.\n\nYou get what you came for:\nTomorrow.\n\nTHE END (Escape Ending)",
-      ending: "escape",
-      choices: [{ id:"to_start", text:"Restart story.", to:"__RESTART__" }, { id:"done", text:"Stay on this ending.", to:"__STAY__" }]
-    },
-
-    end_escape_clean: {
-      title: "Clean Escape",
-      subtitle: "Heat low. Exit clean. Regret optional.",
-      text:
-"You slip through quietly.\n\nOutside, you hear arguing.\n\nYour name never gets spoken.\n\nThat is the closest thing to victory you can afford.\n\nTHE END (Clean Escape Ending)",
-      ending: "escape_clean",
-      choices: [{ id:"to_start2", text:"Restart story.", to:"__RESTART__" }, { id:"done2", text:"Stay on this ending.", to:"__STAY__" }]
-    },
-
-    end_abort: {
-      title: "Abort",
-      subtitle: "Professional survival.",
-      text:
-"You walk away.\n\nThe dock behind you erupts into shouting anyway.\n\nSometimes survival is the only professional standard.\n\nTHE END (Abort Ending)",
-      ending: "abort",
-      choices: [{ id:"to_start3", text:"Restart story.", to:"__RESTART__" }, { id:"done3", text:"Stay on this ending.", to:"__STAY__" }]
-    },
-
-    end_cuffed: {
-      title: "Cuffed",
-      subtitle: "Legal trouble is still trouble.",
-      text:
-"The troopers take you in.\n\nYou are nobody, which is exactly why you are useful.\n\nYour last glimpse of Dock 9 is the latch clicking somewhere else.\n\nTHE END (Cuffed Ending)",
-      ending: "cuffed",
-      choices: [{ id:"to_start4", text:"Restart story.", to:"__RESTART__" }, { id:"done4", text:"Stay on this ending.", to:"__STAY__" }]
-    },
-
-    end_opened: {
-      title: "Opened",
-      subtitle: "Curiosity tax, paid in full.",
-      text:
-"You open the case.\n\nInside: a small red module blinking politely.\n\nThen it stops blinking.\n\nTHE END (Opened Ending)",
-      ending: "opened",
-      choices: [{ id:"to_start5", text:"Restart story.", to:"__RESTART__" }, { id:"done5", text:"Stay on this ending.", to:"__STAY__" }]
-    },
-
-    end_leverage: {
-      title: "Leverage",
-      subtitle: "Now everyone wants you alive.",
-      text:
-"You trade the beacon and take the credits.\n\nIt works.\n\nFor now.\n\nBut you feel it: the galaxy noticed you.\n\nThat is never free.\n\nTHE END (Leverage Ending)",
-      ending: "leverage",
-      choices: [{ id:"to_start6", text:"Restart story.", to:"__RESTART__" }, { id:"done6", text:"Stay on this ending.", to:"__STAY__" }]
-    },
-
-    end_ambush: {
-      title: "Ambush",
-      subtitle: "You win enough. Not clean.",
-      text:
-"You hit first.\n\nYou do not win clean.\n\nBut you win enough.\n\nAnd enough is sometimes the only currency that matters.\n\nTHE END (Ambush Ending)",
-      ending: "ambush",
-      choices: [{ id:"to_start7", text:"Restart story.", to:"__RESTART__" }, { id:"done7", text:"Stay on this ending.", to:"__STAY__" }]
-    },
-
-    end_hook: {
-      title: "Hook",
-      subtitle: "A bigger game begins.",
-      text:
-"You step into a corridor that shouldn't exist.\n\nA cloaked figure with your scar offers you the truth.\n\nYou realize you were never the delivery.\n\nYou were the distraction.\n\nAnd now you get to choose whether you're prey...\n\nOr a problem.\n\nTHE END (Hook Ending)",
-      ending: "hook",
-      choices: [{ id:"to_start8", text:"Restart story.", to:"__RESTART__" }, { id:"done8", text:"Stay on this ending.", to:"__STAY__" }]
+        ending: "escape",
+        choices: [{ id:"restart1", text:"Restart story.", to:"__RESTART__" }]
+      },
+      end_escape_clean: {
+        title: "Clean Escape",
+        subtitle: "Heat low. Exit clean.",
+        text:
+"You slip through quietly.\n\nYour name never gets spoken.\n\nThat is the closest thing to victory you can afford.\n\nTHE END (Clean Escape Ending)",
+        ending: "escape_clean",
+        choices: [{ id:"restart2", text:"Restart story.", to:"__RESTART__" }]
+      },
+      end_abort: {
+        title: "Abort",
+        subtitle: "Professional survival.",
+        text:
+"You walk away.\n\nThe dock erupts into shouting anyway.\n\nSometimes survival is the only standard.\n\nTHE END (Abort Ending)",
+        ending: "abort",
+        choices: [{ id:"restart3", text:"Restart story.", to:"__RESTART__" }]
+      },
+      end_cuffed: {
+        title: "Cuffed",
+        subtitle: "Legal trouble is still trouble.",
+        text:
+"The troopers take you in.\n\nYou are nobody, which is exactly why you are useful.\n\nThe latch clicks somewhere else.\n\nTHE END (Cuffed Ending)",
+        ending: "cuffed",
+        choices: [{ id:"restart4", text:"Restart story.", to:"__RESTART__" }]
+      },
+      end_opened: {
+        title: "Opened",
+        subtitle: "Curiosity tax, paid in full.",
+        text:
+"You open the case.\n\nInside: a red module blinking politely.\n\nThen it stops blinking.\n\nTHE END (Opened Ending)",
+        ending: "opened",
+        choices: [{ id:"restart5", text:"Restart story.", to:"__RESTART__" }]
+      },
+      end_leverage: {
+        title: "Leverage",
+        subtitle: "Now everyone wants you alive.",
+        text:
+"You trade the beacon and take the credits.\n\nIt works.\n\nFor now.\n\nBut the galaxy noticed you.\n\nTHE END (Leverage Ending)",
+        ending: "leverage",
+        choices: [{ id:"restart6", text:"Restart story.", to:"__RESTART__" }]
+      },
+      end_ambush: {
+        title: "Ambush",
+        subtitle: "You win enough. Not clean.",
+        text:
+"You hit first.\n\nYou do not win clean.\n\nBut you win enough.\n\nTHE END (Ambush Ending)",
+        ending: "ambush",
+        choices: [{ id:"restart7", text:"Restart story.", to:"__RESTART__" }]
+      },
+      end_hook: {
+        title: "Hook",
+        subtitle: "A bigger game begins.",
+        text:
+"You step into a corridor that shouldn't exist.\n\nThe cloaked figure offers you the truth.\n\nYou were never the delivery.\n\nYou were the distraction.\n\nAnd now you get to choose what you are next.\n\nTHE END (Hook Ending)",
+        ending: "hook",
+        choices: [{ id:"restart8", text:"Restart story.", to:"__RESTART__" }]
+      }
     }
-  }
-};
-
-// ----------- Engine State -----------
-let state = null;
-let endingsFound = new Set();
-
-// ----------- Utilities -----------
-function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-
-function setFooter(msg){
-  document.getElementById("footerMsg").textContent = msg || "";
-}
-
-function safeClampStats(){
-  state.stats.hp = Math.max(0, state.stats.hp);
-  state.stats.heat = Math.max(0, state.stats.heat);
-  state.stats.nerve = Math.max(0, state.stats.nerve);
-}
-
-function hasAll(arr, need){
-  const s = new Set(arr);
-  for (const n of need) if (!s.has(n)) return false;
-  return true;
-}
-
-function canSeeChoice(choice){
-  // Show all choices; lock those not meeting requirements.
-  return true;
-}
-
-function meetsReq(choice){
-  const req = choice.req;
-  if (!req) return { ok:true, why: "" };
-
-  if (req.flags && !hasAll(state.flags, req.flags)) {
-    return { ok:false, why: "Needs intel: " + req.flags.join(", ") };
-  }
-  if (req.items && !hasAll(state.items, req.items)) {
-    return { ok:false, why: "Needs item: " + req.items.join(", ") };
-  }
-  if (req.statMin){
-    for (const [k,v] of Object.entries(req.statMin)){
-      if ((state.stats[k] ?? 0) < v) return { ok:false, why:`Needs ${k} >= ${v}` };
-    }
-  }
-  if (req.statMax){
-    for (const [k,v] of Object.entries(req.statMax)){
-      if ((state.stats[k] ?? 0) > v) return { ok:false, why:`Needs ${k} <= ${v}` };
-    }
-  }
-
-  if (choice.once){
-    const key = (state.nodeId + "::" + (choice.id || choice.text));
-    if (state.seenOnce.includes(key)) return { ok:false, why:"Already used" };
-  }
-
-  return { ok:true, why:"" };
-}
-
-function applyEffects(effects){
-  if (!effects) return;
-
-  if (effects.setFlags){
-    for (const f of effects.setFlags){
-      if (!state.flags.includes(f)) state.flags.push(f);
-    }
-  }
-  if (effects.clearFlags){
-    state.flags = state.flags.filter(f => !effects.clearFlags.includes(f));
-  }
-  if (effects.addItems){
-    for (const it of effects.addItems){
-      if (!state.items.includes(it)) state.items.push(it);
-    }
-  }
-  if (effects.removeItems){
-    state.items = state.items.filter(it => !effects.removeItems.includes(it));
-  }
-  if (effects.addStats){
-    for (const [k,delta] of Object.entries(effects.addStats)){
-      state.stats[k] = (state.stats[k] ?? 0) + delta;
-    }
-  }
-  safeClampStats();
-}
-
-function logEvent(title, summary){
-  state.log.unshift({
-    t: title,
-    s: summary,
-    ts: new Date().toISOString()
-  });
-  // cap log
-  if (state.log.length > 60) state.log = state.log.slice(0, 60);
-}
-
-function save(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  localStorage.setItem(ENDING_KEY, JSON.stringify(Array.from(endingsFound)));
-}
-
-function load(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  const eraw = localStorage.getItem(ENDING_KEY);
-
-  if (eraw){
-    try { endingsFound = new Set(JSON.parse(eraw) || []); } catch {}
-  }
-
-  if (!raw) return null;
-  try{
-    const parsed = JSON.parse(raw);
-    // basic shape guard
-    if (!parsed || !parsed.nodeId || !parsed.stats) return null;
-    return parsed;
-  }catch{
-    return null;
-  }
-}
-
-function clearProgress(){
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(ENDING_KEY);
-  endingsFound = new Set();
-  state = freshState();
-  render();
-  setFooter("Cleared progress.");
-}
-
-function freshState(){
-  return deepClone(STORY.initialState);
-}
-
-function restart(){
-  state = freshState();
-  logEvent("Restarted", "New run started at Dock 9.");
-  save();
-  render();
-}
-
-function exportSave(){
-  const payload = {
-    save: state,
-    endings: Array.from(endingsFound),
-    version: 2
   };
-  const txt = JSON.stringify(payload, null, 2);
-  // Copy to clipboard if possible; fallback to prompt.
-  if (navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(() => {
-      setFooter("Export copied to clipboard.");
-    }).catch(() => {
-      window.prompt("Copy this save JSON:", txt);
-    });
-  } else {
-    window.prompt("Copy this save JSON:", txt);
-  }
-}
 
-function importSave(){
-  const txt = window.prompt("Paste save JSON here:");
-  if (!txt) return;
-  try{
-    const payload = JSON.parse(txt);
-    if (!payload || !payload.save || !payload.save.nodeId) throw new Error("bad payload");
-    state = payload.save;
-    endingsFound = new Set(payload.endings || []);
+  // -------- State --------
+  var state = null;
+  var endingsFound = new Set();
+
+  function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+
+  function clamp(){
+    state.stats.hp = Math.max(0, state.stats.hp);
+    state.stats.nerve = Math.max(0, state.stats.nerve);
+    state.stats.heat = Math.max(0, state.stats.heat);
+  }
+
+  function setFooter(msg){
+    document.getElementById("footerMsg").textContent = msg || "";
+  }
+
+  function hasAll(haveArr, needArr){
+    var s = new Set(haveArr);
+    for (var i=0;i<needArr.length;i++) if (!s.has(needArr[i])) return false;
+    return true;
+  }
+
+  function meetsReq(choice){
+    var req = choice.req;
+    if (!req) return { ok:true, why:"" };
+
+    if (req.flags && !hasAll(state.flags, req.flags)) return { ok:false, why:"Needs intel: " + req.flags.join(", ") };
+    if (req.items && !hasAll(state.items, req.items)) return { ok:false, why:"Needs item: " + req.items.join(", ") };
+
+    if (req.statMin){
+      for (var k in req.statMin){
+        if ((state.stats[k] || 0) < req.statMin[k]) return { ok:false, why:"Needs " + k + " >= " + req.statMin[k] };
+      }
+    }
+    if (req.statMax){
+      for (var k2 in req.statMax){
+        if ((state.stats[k2] || 0) > req.statMax[k2]) return { ok:false, why:"Needs " + k2 + " <= " + req.statMax[k2] };
+      }
+    }
+
+    if (choice.once){
+      var key = state.nodeId + "::" + (choice.id || choice.text);
+      if (state.seenOnce.indexOf(key) !== -1) return { ok:false, why:"Already used" };
+    }
+
+    return { ok:true, why:"" };
+  }
+
+  function applyEffects(eff){
+    if (!eff) return;
+    if (eff.setFlags){
+      eff.setFlags.forEach(function(f){ if (state.flags.indexOf(f)===-1) state.flags.push(f); });
+    }
+    if (eff.addItems){
+      eff.addItems.forEach(function(it){ if (state.items.indexOf(it)===-1) state.items.push(it); });
+    }
+    if (eff.addStats){
+      for (var k in eff.addStats){
+        state.stats[k] = (state.stats[k] || 0) + eff.addStats[k];
+      }
+    }
+    clamp();
+  }
+
+  function logEvent(title, summary){
+    state.log.unshift({ t:title, s:summary || "", ts:(new Date()).toISOString() });
+    if (state.log.length > 60) state.log = state.log.slice(0,60);
+  }
+
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(ENDING_KEY, JSON.stringify(Array.from(endingsFound)));
+  }
+
+  function load(){
+    var eraw = localStorage.getItem(ENDING_KEY);
+    if (eraw){
+      try { endingsFound = new Set(JSON.parse(eraw) || []); } catch(e){}
+    }
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    try{
+      var parsed = JSON.parse(raw);
+      if (!parsed || !parsed.nodeId || !parsed.stats) return null;
+      return parsed;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function recordEnding(id){
+    if (!id) return;
+    endingsFound.add(id);
+  }
+
+  function restart(){
+    state = deepClone(STORY.initialState);
+    logEvent("New Run", "Dock 9. One minute. Three watchers.");
     save();
     render();
-    setFooter("Imported save.");
-  }catch{
-    setFooter("Import failed (invalid JSON).");
-  }
-}
-
-function recordEnding(endingId){
-  if (!endingId) return;
-  endingsFound.add(endingId);
-  save();
-}
-
-function goTo(nodeId){
-  if (nodeId === "__STAY__") return;
-  if (nodeId === "__RESTART__") return restart();
-
-  const current = STORY.nodes[state.nodeId];
-  // push history for back only if not already an ending terminal hop
-  state.history.push(state.nodeId);
-
-  state.nodeId = nodeId;
-  save();
-  render();
-}
-
-function choose(choice){
-  const check = meetsReq(choice);
-  if (!check.ok){
-    setFooter("Locked: " + check.why);
-    return;
+    setFooter("Restarted.");
   }
 
-  if (choice.once){
-    const key = (state.nodeId + "::" + (choice.id || choice.text));
-    if (!state.seenOnce.includes(key)) state.seenOnce.push(key);
+  function clearProgress(){
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(ENDING_KEY);
+    endingsFound = new Set();
+    restart();
   }
 
-  applyEffects(choice.effects);
-
-  // log
-  const noteBits = [];
-  if (choice.note) noteBits.push(choice.note);
-  if (choice.effects?.setFlags?.length) noteBits.push("Intel: " + choice.effects.setFlags.join(", "));
-  if (choice.effects?.addItems?.length) noteBits.push("Item: " + choice.effects.addItems.join(", "));
-  if (choice.effects?.addStats) {
-    const s = Object.entries(choice.effects.addStats).map(([k,v]) => `${k}${v>=0?"+":""}${v}`).join(", ");
-    noteBits.push("Stats: " + s);
-  }
-  logEvent(choice.text, noteBits.join(" | ") || "Moved forward.");
-
-  // handle special meta routes
-  if (choice.to === "__RESTART__") return restart();
-  if (choice.to === "__STAY__") { save(); render(); return; }
-
-  // If this node is an ending node, record it after move, not before.
-  state.nodeId = choice.to;
-
-  const nextNode = STORY.nodes[state.nodeId];
-  if (choice.ending) recordEnding(choice.ending);
-  if (nextNode && nextNode.ending) recordEnding(nextNode.ending);
-
-  save();
-  render();
-}
-
-function back(){
-  if (!state.history.length){
-    setFooter("No previous node.");
-    return;
-  }
-  const prev = state.history.pop();
-  state.nodeId = prev;
-  save();
-  render();
-}
-
-// ----------- Rendering -----------
-function pill(txt, cls){
-  const d = document.createElement("div");
-  d.className = "pill " + (cls || "");
-  d.textContent = txt;
-  return d;
-}
-
-function render(){
-  const node = STORY.nodes[state.nodeId];
-
-  // Title area
-  document.getElementById("nodeTitle").textContent = node ? node.title : "Missing Node";
-  document.getElementById("nodeSubtitle").textContent = node ? node.subtitle || "" : state.nodeId;
-
-  // Status pills
-  const pills = document.getElementById("statusPills");
-  pills.innerHTML = "";
-  pills.appendChild(pill("HP: " + state.stats.hp, state.stats.hp <= 1 ? "bad" : ""));
-  pills.appendChild(pill("Nerve: " + state.stats.nerve, state.stats.nerve >= 2 ? "good" : ""));
-  pills.appendChild(pill("Heat: " + state.stats.heat, state.stats.heat >= 3 ? "warn" : ""));
-  if (state.items.length) pills.appendChild(pill("Items: " + state.items.join(", ")));
-  if (state.flags.length) pills.appendChild(pill("Intel: " + state.flags.join(", ")));
-
-  // KPIs
-  document.getElementById("kpiHp").textContent = String(state.stats.hp);
-  document.getElementById("kpiNerve").textContent = String(state.stats.nerve);
-  document.getElementById("kpiHeat").textContent = String(state.stats.heat);
-
-  // Inventory list
-  const inv = document.getElementById("invList");
-  inv.innerHTML = "";
-  (state.items.length ? state.items : ["(none)"]).forEach(it => {
-    const li = document.createElement("li");
-    li.textContent = it;
-    inv.appendChild(li);
-  });
-
-  // Flags list
-  const fl = document.getElementById("flagList");
-  fl.innerHTML = "";
-  (state.flags.length ? state.flags : ["(none)"]).forEach(it => {
-    const li = document.createElement("li");
-    li.textContent = it;
-    fl.appendChild(li);
-  });
-
-  // Endings tags
-  const endingTags = document.getElementById("endingTags");
-  endingTags.innerHTML = "";
-  const allEndings = ["abort","escape","escape_clean","cuffed","opened","leverage","ambush","hook"];
-  for (const e of allEndings){
-    const t = document.createElement("div");
-    t.className = "tag";
-    t.textContent = endingsFound.has(e) ? ("FOUND: " + e) : ("??? " + e);
-    t.style.borderColor = endingsFound.has(e) ? "#3f7a62" : "#25314a";
-    t.style.opacity = endingsFound.has(e) ? "1" : ".75";
-    endingTags.appendChild(t);
+  function back(){
+    if (!state.history.length){ setFooter("No previous node."); return; }
+    state.nodeId = state.history.pop();
+    save();
+    render();
+    setFooter("");
   }
 
-  // Story text
-  document.getElementById("storyText").textContent = node ? node.text : "Node not found.";
+  function choose(choice){
+    if (choice.to === "__RESTART__") { restart(); return; }
 
-  // Choices
-  const choicesEl = document.getElementById("choices");
-  choicesEl.innerHTML = "";
-  const choices = node ? (node.choices || []) : [];
+    var check = meetsReq(choice);
+    if (!check.ok){ setFooter("Locked: " + check.why); return; }
 
-  // If node itself is an ending, record it.
-  if (node && node.ending) recordEnding(node.ending);
+    if (choice.once){
+      var key = state.nodeId + "::" + (choice.id || choice.text);
+      if (state.seenOnce.indexOf(key)===-1) state.seenOnce.push(key);
+    }
 
-  if (!choices.length){
-    const d = document.createElement("div");
-    d.className = "muted";
-    d.textContent = "No choices available.";
-    choicesEl.appendChild(d);
-  } else {
-    for (const c of choices){
-      const check = meetsReq(c);
+    applyEffects(choice.effects);
 
+    var note = choice.note ? choice.note : "";
+    logEvent(choice.text, note);
+
+    state.history.push(state.nodeId);
+    state.nodeId = choice.to;
+
+    if (choice.ending) recordEnding(choice.ending);
+    var nextNode = STORY.nodes[state.nodeId];
+    if (nextNode && nextNode.ending) recordEnding(nextNode.ending);
+
+    save();
+    render();
+    setFooter("");
+  }
+
+  function esc(s){
+    s = String(s);
+    return s
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#039;");
+  }
+
+  function render(){
+    var node = STORY.nodes[state.nodeId];
+    if (!node){
+      document.getElementById("nodeTitle").textContent = "Missing Node";
+      document.getElementById("nodeSubtitle").textContent = state.nodeId;
+      document.getElementById("storyText").textContent = "This node id does not exist.";
+      document.getElementById("choices").innerHTML = "";
+      return;
+    }
+
+    // ending record
+    if (node.ending) recordEnding(node.ending);
+
+    document.getElementById("nodeTitle").textContent = node.title;
+    document.getElementById("nodeSubtitle").textContent = node.subtitle || "";
+
+    // pills
+    var pills = document.getElementById("statusPills");
+    pills.innerHTML = "";
+    var p1 = document.createElement("div"); p1.className="pill"; p1.textContent="HP: " + state.stats.hp; pills.appendChild(p1);
+    var p2 = document.createElement("div"); p2.className="pill"; p2.textContent="Nerve: " + state.stats.nerve; pills.appendChild(p2);
+    var p3 = document.createElement("div"); p3.className="pill"; p3.textContent="Heat: " + state.stats.heat; pills.appendChild(p3);
+
+    document.getElementById("kpiHp").textContent = String(state.stats.hp);
+    document.getElementById("kpiNerve").textContent = String(state.stats.nerve);
+    document.getElementById("kpiHeat").textContent = String(state.stats.heat);
+
+    // inventory
+    var inv = document.getElementById("invList");
+    inv.innerHTML = "";
+    (state.items.length ? state.items : ["(none)"]).forEach(function(it){
+      var li = document.createElement("li"); li.textContent = it; inv.appendChild(li);
+    });
+
+    // flags
+    var fl = document.getElementById("flagList");
+    fl.innerHTML = "";
+    (state.flags.length ? state.flags : ["(none)"]).forEach(function(it){
+      var li2 = document.createElement("li"); li2.textContent = it; fl.appendChild(li2);
+    });
+
+    // endings
+    var endingTags = document.getElementById("endingTags");
+    endingTags.innerHTML = "";
+    var all = ["abort","escape","escape_clean","cuffed","opened","leverage","ambush","hook"];
+    all.forEach(function(e){
+      var t = document.createElement("div");
+      t.className = "tag";
+      t.textContent = endingsFound.has(e) ? ("FOUND: " + e) : ("??? " + e);
+      t.style.borderColor = endingsFound.has(e) ? "#3f7a62" : "#25314a";
+      t.style.opacity = endingsFound.has(e) ? "1" : ".75";
+      endingTags.appendChild(t);
+    });
+
+    // story text
+    document.getElementById("storyText").textContent = node.text;
+
+    // choices
+    var choicesEl = document.getElementById("choices");
+    choicesEl.innerHTML = "";
+    var choices = node.choices || [];
+    choices.forEach(function(c){
+      var check = meetsReq(c);
       if (check.ok){
-        const b = document.createElement("button");
+        var b = document.createElement("button");
         b.className = "choiceBtn";
-        b.innerHTML = "&#8594; " + escapeHtml(c.text);
-        b.addEventListener("click", () => choose(c));
-
-        const meta = document.createElement("div");
+        b.innerHTML = "&#8594; " + esc(c.text);
+        b.addEventListener("click", function(){ choose(c); });
+        var meta = document.createElement("div");
         meta.className = "choiceMeta";
-        meta.textContent = buildChoiceMeta(c);
-
+        meta.textContent = buildMeta(c);
         b.appendChild(meta);
         choicesEl.appendChild(b);
       } else {
-        const locked = document.createElement("div");
+        var locked = document.createElement("div");
         locked.className = "choiceLocked";
-        locked.innerHTML = "&#128274; " + escapeHtml(c.text) + "\n";
-        const meta = document.createElement("div");
-        meta.className = "choiceMeta";
-        meta.textContent = "Locked: " + check.why + (buildChoiceMeta(c) ? " | " + buildChoiceMeta(c) : "");
-        locked.appendChild(meta);
+        locked.innerHTML = "&#128274; " + esc(c.text);
+        var meta2 = document.createElement("div");
+        meta2.className = "choiceMeta";
+        meta2.textContent = "Locked: " + check.why + (buildMeta(c) ? " | " + buildMeta(c) : "");
+        locked.appendChild(meta2);
         choicesEl.appendChild(locked);
       }
+    });
+
+    document.getElementById("btnBack").disabled = (state.history.length === 0);
+
+    // journal
+    var logEl = document.getElementById("log");
+    logEl.innerHTML = "";
+    if (!state.log.length){
+      var d = document.createElement("div"); d.style.opacity=".7"; d.textContent="No journal entries yet."; logEl.appendChild(d);
+    } else {
+      state.log.slice(0,30).forEach(function(e){
+        var box = document.createElement("div");
+        box.className = "logEntry";
+        var tt = document.createElement("div"); tt.className = "t"; tt.textContent = e.t;
+        var ss = document.createElement("div"); ss.className = "s"; ss.textContent = e.s || "";
+        box.appendChild(tt); box.appendChild(ss);
+        logEl.appendChild(box);
+      });
     }
   }
 
-  // Back button
-  document.getElementById("btnBack").disabled = state.history.length === 0;
-
-  // Journal
-  const logEl = document.getElementById("log");
-  logEl.innerHTML = "";
-  if (!state.log.length){
-    const d = document.createElement("div");
-    d.className = "muted";
-    d.textContent = "No journal entries yet.";
-    logEl.appendChild(d);
-  } else {
-    for (const e of state.log.slice(0, 30)){
-      const box = document.createElement("div");
-      box.className = "logEntry";
-      const t = document.createElement("div");
-      t.className = "t";
-      t.textContent = e.t;
-      const s = document.createElement("div");
-      s.className = "s";
-      s.textContent = e.s || "";
-      box.appendChild(t);
-      box.appendChild(s);
-      logEl.appendChild(box);
+  function buildMeta(c){
+    var bits = [];
+    if (c.note) bits.push(c.note);
+    if (c.req && c.req.flags && c.req.flags.length) bits.push("Needs intel: " + c.req.flags.join(", "));
+    if (c.req && c.req.items && c.req.items.length) bits.push("Needs item: " + c.req.items.join(", "));
+    if (c.req && c.req.statMin){
+      var parts = [];
+      for (var k in c.req.statMin) parts.push(k + ">=" + c.req.statMin[k]);
+      bits.push("Req: " + parts.join(", "));
     }
+    if (c.req && c.req.statMax){
+      var parts2 = [];
+      for (var k2 in c.req.statMax) parts2.push(k2 + "<=" + c.req.statMax[k2]);
+      bits.push("Req: " + parts2.join(", "));
+    }
+    if (c.ending) bits.push("Ending: " + c.ending);
+    return bits.join(" | ");
   }
-}
 
-function buildChoiceMeta(c){
-  const bits = [];
-  if (c.note) bits.push(c.note);
-  if (c.req?.flags?.length) bits.push("Needs intel: " + c.req.flags.join(", "));
-  if (c.req?.items?.length) bits.push("Needs item: " + c.req.items.join(", "));
-  if (c.req?.statMin){
-    const s = Object.entries(c.req.statMin).map(([k,v]) => `${k}>=${v}`).join(", ");
-    bits.push("Req: " + s);
-  }
-  if (c.req?.statMax){
-    const s = Object.entries(c.req.statMax).map(([k,v]) => `${k}<=${v}`).join(", ");
-    bits.push("Req: " + s);
-  }
-  if (c.once) bits.push("Once");
-  if (c.ending) bits.push("Ending: " + c.ending);
-  return bits.join(" | ");
-}
+  // UI wire
+  document.getElementById("btnBack").addEventListener("click", back);
+  document.getElementById("btnRestart").addEventListener("click", restart);
+  document.getElementById("btnClear").addEventListener("click", function(){
+    if (confirm("Clear local progress and endings for this story?")) clearProgress();
+  });
+  document.getElementById("btnClearLog").addEventListener("click", function(){
+    state.log = [];
+    save();
+    render();
+    setFooter("Journal cleared.");
+  });
+  document.getElementById("btnHelp").addEventListener("click", function(){
+    alert(
+"How it works:\n\n" +
+"- HP: hits you can take.\n" +
+"- Nerve: unlocks bold choices.\n" +
+"- Heat: attention level. Heat<=1 unlocks clean escape.\n\n" +
+"- Inventory and Intel unlock options.\n" +
+"- Locked choices show requirements.\n" +
+"- Endings are tracked locally.\n"
+    );
+  });
 
-function escapeHtml(str){
-  return String(str)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-// ----------- UI Wiring -----------
-document.getElementById("btnBack").addEventListener("click", () => { back(); setFooter(""); });
-document.getElementById("btnRestart").addEventListener("click", () => { restart(); setFooter("Restarted."); });
-document.getElementById("btnClear").addEventListener("click", () => {
-  const ok = confirm("Clear local progress and endings for this story?");
-  if (ok) clearProgress();
-});
-document.getElementById("btnExport").addEventListener("click", exportSave);
-document.getElementById("btnImport").addEventListener("click", importSave);
-document.getElementById("btnClearLog").addEventListener("click", () => {
-  state.log = [];
-  save();
-  render();
-  setFooter("Journal cleared.");
-});
-document.getElementById("btnHelp").addEventListener("click", () => {
-  alert(
-`How this story works:
-
-- HP: how many hits you can take. Some routes cost HP.
-- Nerve: confidence / initiative. Higher Nerve unlocks bold options.
-- Heat: attention level. Lower Heat unlocks cleaner escapes.
-
-- Inventory: items you picked up.
-- Intel (Flags): facts you learned. Some choices require specific intel.
-
-- Locked choices show you exactly what you need to unlock them.
-- Endings are tracked so you can hunt them like achievements.
-- The Journal keeps the last ~60 decisions.
-
-Have fun: try playing "clean" (Heat <= 1) and then try playing "loud".`
-  );
-});
-
-// ----------- Boot -----------
-(function init(){
-  const loaded = load();
+  // boot
+  var loaded = load();
   if (loaded){
     state = loaded;
     logEvent("Loaded", "Resumed your run.");
   } else {
-    state = freshState();
+    state = deepClone(STORY.initialState);
     logEvent("New Run", "Dock 9. One minute. Three watchers.");
   }
-  safeClampStats();
+  clamp();
   save();
   render();
   setFooter("");
+
 })();
 </script>
 </body>
