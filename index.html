@@ -84,7 +84,9 @@
     <div class="topbar">
       <div>
         <div class="brand">Dockside Dead Drop</div>
-        <div class="subbrand">Single-story Star Wars CYOA (robust engine)</div>
+        <div class="subbrand">
+          Single-story Star Wars CYOA (robust engine) • <span id="buildId"></span>
+        </div>
       </div>
       <div class="row">
         <button id="btnRestart" class="danger">Restart</button>
@@ -107,7 +109,6 @@
         <div class="divider"></div>
 
         <div id="statusPills" class="pillRow"></div>
-
         <div id="storyText" class="storyText"></div>
 
         <div class="divider"></div>
@@ -165,10 +166,26 @@
 (function(){
   "use strict";
 
-  var STORAGE_KEY = "dockside_dead_drop_v3::save";
-  var ENDING_KEY  = "dockside_dead_drop_v3::endings";
+  // Visible build marker so you can confirm deployments/caching
+  var BUILD_ID = "build-2026-01-13b";
+  document.getElementById("buildId").textContent = BUILD_ID;
 
-  // -------- Story --------
+  var STORAGE_KEY = "dockside_dead_drop_v4::save";
+  var ENDING_KEY  = "dockside_dead_drop_v4::endings";
+
+  // localStorage fallback (some managed devices block it)
+  var canStore = true;
+  try {
+    var t = "__test__";
+    localStorage.setItem(t, "1");
+    localStorage.removeItem(t);
+  } catch(e) {
+    canStore = false;
+  }
+  function storeSet(k,v){ if (!canStore) return; localStorage.setItem(k,v); }
+  function storeGet(k){ if (!canStore) return null; return localStorage.getItem(k); }
+  function storeDel(k){ if (!canStore) return; localStorage.removeItem(k); }
+
   var STORY = {
     start: "cold_open",
     initialState: {
@@ -192,7 +209,6 @@
           { id:"abort", text:"Abort. Leave the dock now.", to:"end_abort", ending:"abort" }
         ]
       },
-
       scan: {
         title: "Three Sets of Eyes",
         subtitle: "Imperial, criminal, and something quieter.",
@@ -206,7 +222,6 @@
           { id:"go_now", text:"Ignore them. Approach the courier droid.", to:"approach" }
         ]
       },
-
       trooper_line: {
         title: "Bold",
         subtitle: "You are now a person worth noticing.",
@@ -217,7 +232,6 @@
           { id:"vanish", text:"Vanish into cargo shadows and reset the angle.", to:"shadow_lane_setup", effects:{ addStats:{ heat:-1 } }, note:"-1 Heat" }
         ]
       },
-
       approach: {
         title: "The Courier Droid",
         subtitle: "Swap clean. No drama. No curiosity.",
@@ -229,7 +243,6 @@
           { id:"talk_droid", text:"Talk to the droid (might gain intel).", to:"talk_droid", effects:{ addStats:{ heat:+1 } }, note:"+1 Heat" }
         ]
       },
-
       talk_droid: {
         title: "The Droid Answers",
         subtitle: "It knows more than it should.",
@@ -241,7 +254,6 @@
             effects:{ setFlags:["droid_warning"], addStats:{ heat:-1 } }, note:"Sets droid_warning, -1 Heat" }
         ]
       },
-
       weight_check: {
         title: "Wrong Weight",
         subtitle: "Too light. Too clean. Too intentional.",
@@ -254,7 +266,6 @@
           { id:"abort_here", text:"Signal abort and walk away alive.", to:"end_abort", ending:"abort" }
         ]
       },
-
       grab_droid: {
         title: "You Grab The Droid",
         subtitle: "Under the plating. Behind the story.",
@@ -267,7 +278,6 @@
             effects:{ setFlags:["kept_beacon","setup_confirmed"], addStats:{ heat:+1 } }, note:"Sets kept_beacon + setup_confirmed, +1 Heat" }
         ]
       },
-
       swap: {
         title: "The Swap",
         subtitle: "Hands like practiced betrayal.",
@@ -279,7 +289,6 @@
           { id:"handoff_cloak", text:"Hand the case to the cloaked figure (test the angle).", to:"handoff", effects:{ addStats:{ heat:+1 } }, note:"+1 Heat" }
         ]
       },
-
       bluff: {
         title: "The Bluff",
         subtitle: "Four seconds of narrative control.",
@@ -292,7 +301,6 @@
           { id:"surrender", text:"Surrender to the troopers.", to:"end_cuffed", ending:"cuffed" }
         ]
       },
-
       rodian_deal: {
         title: "Rodian Deal",
         subtitle: "Greed beats loyalty every time.",
@@ -303,7 +311,6 @@
           { id:"open_case", text:"Open the case (curiosity tax).", to:"end_opened", ending:"opened" }
         ]
       },
-
       handoff: {
         title: "The Handoff",
         subtitle: "You were meant to be blamed.",
@@ -316,7 +323,6 @@
           { id:"ask_question", text:"Ask: 'Who set me up?'", to:"hook_follow", req:{ flags:["droid_warning"] }, effects:{ addStats:{ nerve:+1 } }, note:"Needs droid_warning, +1 Nerve" }
         ]
       },
-
       chaos_case: {
         title: "Case Loose",
         subtitle: "Everyone lunges. One person doesn't.",
@@ -327,7 +333,6 @@
           { id:"run_other", text:"Run the other way and disappear.", to:"shadow_lane_escape", effects:{ addStats:{ hp:-1 } }, note:"-1 HP" }
         ]
       },
-
       shadow_lane_setup: {
         title: "Cargo Shadows",
         subtitle: "A quieter angle. A better exit.",
@@ -339,7 +344,6 @@
             effects:{ setFlags:["decoy_active"], addStats:{ heat:-1 } }, note:"Needs decoy_plan, sets decoy_active, -1 Heat" }
         ]
       },
-
       shadow_lane_escape: {
         title: "Service Lane",
         subtitle: "Pipes, cables, and choices that bite.",
@@ -353,7 +357,6 @@
             effects:{ addStats:{ hp:-1, heat:+1 } }, note:"Needs Nerve>=2, -1 HP, +1 Heat" }
         ]
       },
-
       leverage_path: {
         title: "Leverage",
         subtitle: "Everyone wants you alive. That can be protection.",
@@ -365,7 +368,6 @@
           { id:"trade_troopers", text:"Hand it to the troopers (freedom loss).", to:"end_cuffed", ending:"cuffed" }
         ]
       },
-
       hook_follow: {
         title: "A Door That Wasn't There",
         subtitle: "A bigger game begins.",
@@ -449,17 +451,12 @@
   var endingsFound = new Set();
 
   function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
-
   function clamp(){
     state.stats.hp = Math.max(0, state.stats.hp);
     state.stats.nerve = Math.max(0, state.stats.nerve);
     state.stats.heat = Math.max(0, state.stats.heat);
   }
-
-  function setFooter(msg){
-    document.getElementById("footerMsg").textContent = msg || "";
-  }
-
+  function setFooter(msg){ document.getElementById("footerMsg").textContent = msg || ""; }
   function hasAll(haveArr, needArr){
     var s = new Set(haveArr);
     for (var i=0;i<needArr.length;i++) if (!s.has(needArr[i])) return false;
@@ -469,10 +466,8 @@
   function meetsReq(choice){
     var req = choice.req;
     if (!req) return { ok:true, why:"" };
-
     if (req.flags && !hasAll(state.flags, req.flags)) return { ok:false, why:"Needs intel: " + req.flags.join(", ") };
     if (req.items && !hasAll(state.items, req.items)) return { ok:false, why:"Needs item: " + req.items.join(", ") };
-
     if (req.statMin){
       for (var k in req.statMin){
         if ((state.stats[k] || 0) < req.statMin[k]) return { ok:false, why:"Needs " + k + " >= " + req.statMin[k] };
@@ -483,28 +478,14 @@
         if ((state.stats[k2] || 0) > req.statMax[k2]) return { ok:false, why:"Needs " + k2 + " <= " + req.statMax[k2] };
       }
     }
-
-    if (choice.once){
-      var key = state.nodeId + "::" + (choice.id || choice.text);
-      if (state.seenOnce.indexOf(key) !== -1) return { ok:false, why:"Already used" };
-    }
-
     return { ok:true, why:"" };
   }
 
   function applyEffects(eff){
     if (!eff) return;
-    if (eff.setFlags){
-      eff.setFlags.forEach(function(f){ if (state.flags.indexOf(f)===-1) state.flags.push(f); });
-    }
-    if (eff.addItems){
-      eff.addItems.forEach(function(it){ if (state.items.indexOf(it)===-1) state.items.push(it); });
-    }
-    if (eff.addStats){
-      for (var k in eff.addStats){
-        state.stats[k] = (state.stats[k] || 0) + eff.addStats[k];
-      }
-    }
+    if (eff.setFlags) eff.setFlags.forEach(function(f){ if (state.flags.indexOf(f)===-1) state.flags.push(f); });
+    if (eff.addItems) eff.addItems.forEach(function(it){ if (state.items.indexOf(it)===-1) state.items.push(it); });
+    if (eff.addStats) for (var k in eff.addStats) state.stats[k] = (state.stats[k] || 0) + eff.addStats[k];
     clamp();
   }
 
@@ -514,42 +495,32 @@
   }
 
   function save(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    localStorage.setItem(ENDING_KEY, JSON.stringify(Array.from(endingsFound)));
+    storeSet(STORAGE_KEY, JSON.stringify(state));
+    storeSet(ENDING_KEY, JSON.stringify(Array.from(endingsFound)));
   }
 
   function load(){
-    var eraw = localStorage.getItem(ENDING_KEY);
-    if (eraw){
-      try { endingsFound = new Set(JSON.parse(eraw) || []); } catch(e){}
-    }
-    var raw = localStorage.getItem(STORAGE_KEY);
+    var eraw = storeGet(ENDING_KEY);
+    if (eraw){ try { endingsFound = new Set(JSON.parse(eraw) || []); } catch(e){} }
+    var raw = storeGet(STORAGE_KEY);
     if (!raw) return null;
     try{
       var parsed = JSON.parse(raw);
       if (!parsed || !parsed.nodeId || !parsed.stats) return null;
       return parsed;
-    }catch(e){
-      return null;
-    }
+    }catch(e){ return null; }
   }
 
-  function recordEnding(id){
-    if (!id) return;
-    endingsFound.add(id);
-  }
+  function recordEnding(id){ if (id) endingsFound.add(id); }
 
   function restart(){
     state = deepClone(STORY.initialState);
     logEvent("New Run", "Dock 9. One minute. Three watchers.");
-    save();
-    render();
-    setFooter("Restarted.");
+    save(); render(); setFooter("Restarted.");
   }
 
   function clearProgress(){
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(ENDING_KEY);
+    storeDel(STORAGE_KEY); storeDel(ENDING_KEY);
     endingsFound = new Set();
     restart();
   }
@@ -557,26 +528,17 @@
   function back(){
     if (!state.history.length){ setFooter("No previous node."); return; }
     state.nodeId = state.history.pop();
-    save();
-    render();
-    setFooter("");
+    save(); render(); setFooter("");
   }
 
   function choose(choice){
-    if (choice.to === "__RESTART__") { restart(); return; }
+    if (choice.to === "__RESTART__"){ restart(); return; }
 
     var check = meetsReq(choice);
     if (!check.ok){ setFooter("Locked: " + check.why); return; }
 
-    if (choice.once){
-      var key = state.nodeId + "::" + (choice.id || choice.text);
-      if (state.seenOnce.indexOf(key)===-1) state.seenOnce.push(key);
-    }
-
     applyEffects(choice.effects);
-
-    var note = choice.note ? choice.note : "";
-    logEvent(choice.text, note);
+    logEvent(choice.text, choice.note || "");
 
     state.history.push(state.nodeId);
     state.nodeId = choice.to;
@@ -585,19 +547,7 @@
     var nextNode = STORY.nodes[state.nodeId];
     if (nextNode && nextNode.ending) recordEnding(nextNode.ending);
 
-    save();
-    render();
-    setFooter("");
-  }
-
-  function esc(s){
-    s = String(s);
-    return s
-      .replace(/&/g,"&amp;")
-      .replace(/</g,"&lt;")
-      .replace(/>/g,"&gt;")
-      .replace(/"/g,"&quot;")
-      .replace(/'/g,"&#039;");
+    save(); render(); setFooter("");
   }
 
   function render(){
@@ -610,42 +560,38 @@
       return;
     }
 
-    // ending record
     if (node.ending) recordEnding(node.ending);
 
     document.getElementById("nodeTitle").textContent = node.title;
     document.getElementById("nodeSubtitle").textContent = node.subtitle || "";
+    document.getElementById("storyText").textContent = node.text;
 
     // pills
     var pills = document.getElementById("statusPills");
     pills.innerHTML = "";
-    var p1 = document.createElement("div"); p1.className="pill"; p1.textContent="HP: " + state.stats.hp; pills.appendChild(p1);
-    var p2 = document.createElement("div"); p2.className="pill"; p2.textContent="Nerve: " + state.stats.nerve; pills.appendChild(p2);
-    var p3 = document.createElement("div"); p3.className="pill"; p3.textContent="Heat: " + state.stats.heat; pills.appendChild(p3);
+    [["HP",state.stats.hp],["Nerve",state.stats.nerve],["Heat",state.stats.heat]].forEach(function(p){
+      var d = document.createElement("div"); d.className="pill"; d.textContent=p[0]+": "+p[1]; pills.appendChild(d);
+    });
 
     document.getElementById("kpiHp").textContent = String(state.stats.hp);
     document.getElementById("kpiNerve").textContent = String(state.stats.nerve);
     document.getElementById("kpiHeat").textContent = String(state.stats.heat);
 
     // inventory
-    var inv = document.getElementById("invList");
-    inv.innerHTML = "";
+    var inv = document.getElementById("invList"); inv.innerHTML = "";
     (state.items.length ? state.items : ["(none)"]).forEach(function(it){
       var li = document.createElement("li"); li.textContent = it; inv.appendChild(li);
     });
 
     // flags
-    var fl = document.getElementById("flagList");
-    fl.innerHTML = "";
+    var fl = document.getElementById("flagList"); fl.innerHTML = "";
     (state.flags.length ? state.flags : ["(none)"]).forEach(function(it){
       var li2 = document.createElement("li"); li2.textContent = it; fl.appendChild(li2);
     });
 
     // endings
-    var endingTags = document.getElementById("endingTags");
-    endingTags.innerHTML = "";
-    var all = ["abort","escape","escape_clean","cuffed","opened","leverage","ambush","hook"];
-    all.forEach(function(e){
+    var endingTags = document.getElementById("endingTags"); endingTags.innerHTML = "";
+    ["abort","escape","escape_clean","cuffed","opened","leverage","ambush","hook"].forEach(function(e){
       var t = document.createElement("div");
       t.className = "tag";
       t.textContent = endingsFound.has(e) ? ("FOUND: " + e) : ("??? " + e);
@@ -654,19 +600,14 @@
       endingTags.appendChild(t);
     });
 
-    // story text
-    document.getElementById("storyText").textContent = node.text;
-
     // choices
-    var choicesEl = document.getElementById("choices");
-    choicesEl.innerHTML = "";
-    var choices = node.choices || [];
-    choices.forEach(function(c){
+    var choicesEl = document.getElementById("choices"); choicesEl.innerHTML = "";
+    (node.choices || []).forEach(function(c){
       var check = meetsReq(c);
       if (check.ok){
         var b = document.createElement("button");
         b.className = "choiceBtn";
-        b.innerHTML = "&#8594; " + esc(c.text);
+        b.textContent = "→ " + c.text;
         b.addEventListener("click", function(){ choose(c); });
         var meta = document.createElement("div");
         meta.className = "choiceMeta";
@@ -676,7 +617,7 @@
       } else {
         var locked = document.createElement("div");
         locked.className = "choiceLocked";
-        locked.innerHTML = "&#128274; " + esc(c.text);
+        locked.textContent = "🔒 " + c.text;
         var meta2 = document.createElement("div");
         meta2.className = "choiceMeta";
         meta2.textContent = "Locked: " + check.why + (buildMeta(c) ? " | " + buildMeta(c) : "");
@@ -688,19 +629,22 @@
     document.getElementById("btnBack").disabled = (state.history.length === 0);
 
     // journal
-    var logEl = document.getElementById("log");
-    logEl.innerHTML = "";
+    var logEl = document.getElementById("log"); logEl.innerHTML = "";
     if (!state.log.length){
       var d = document.createElement("div"); d.style.opacity=".7"; d.textContent="No journal entries yet."; logEl.appendChild(d);
     } else {
       state.log.slice(0,30).forEach(function(e){
-        var box = document.createElement("div");
-        box.className = "logEntry";
-        var tt = document.createElement("div"); tt.className = "t"; tt.textContent = e.t;
-        var ss = document.createElement("div"); ss.className = "s"; ss.textContent = e.s || "";
+        var box = document.createElement("div"); box.className = "logEntry";
+        var tt = document.createElement("div"); tt.className="t"; tt.textContent = e.t;
+        var ss = document.createElement("div"); ss.className="s"; ss.textContent = e.s || "";
         box.appendChild(tt); box.appendChild(ss);
         logEl.appendChild(box);
       });
+    }
+
+    // If storage blocked, warn (but still runs)
+    if (!canStore){
+      setFooter("Note: localStorage is blocked on this device, so progress won't persist after refresh.");
     }
   }
 
@@ -731,19 +675,17 @@
   });
   document.getElementById("btnClearLog").addEventListener("click", function(){
     state.log = [];
-    save();
-    render();
-    setFooter("Journal cleared.");
+    save(); render(); setFooter("Journal cleared.");
   });
   document.getElementById("btnHelp").addEventListener("click", function(){
     alert(
-"How it works:\n\n" +
-"- HP: hits you can take.\n" +
-"- Nerve: unlocks bold choices.\n" +
-"- Heat: attention level. Heat<=1 unlocks clean escape.\n\n" +
-"- Inventory and Intel unlock options.\n" +
-"- Locked choices show requirements.\n" +
-"- Endings are tracked locally.\n"
+      "How it works:\n\n" +
+      "- HP: hits you can take.\n" +
+      "- Nerve: unlocks bold choices.\n" +
+      "- Heat: attention level. Heat<=1 unlocks clean escape.\n\n" +
+      "- Inventory and Intel unlock options.\n" +
+      "- Locked choices show requirements.\n" +
+      "- Endings are tracked locally.\n"
     );
   });
 
@@ -759,7 +701,6 @@
   clamp();
   save();
   render();
-  setFooter("");
 
 })();
 </script>
